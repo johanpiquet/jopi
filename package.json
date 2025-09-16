@@ -1,0 +1,33 @@
+{
+  "name": "jopi",
+  "version": "0.0.1",
+  "license": "MIT",
+  "homepage": "https://github.com/johanpiquet/jopi-rewrite",
+  "keywords": ["express.js", "nextjs", "react", "react-ssr", "react-hydrate"],
+  "author": "Johan PIQUET",
+  "description": "Admin tools for Jopi Rewrite",
+  "engines": {
+    "bun": "^1.2.18",
+    "node": ">=22.18.0"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "src"
+  ],
+  "scripts": {
+    "build": "npx tsc",
+    "tsc": "npx tsc",
+    "bun-publish": "npx tsc && bun publish",
+    "start": "node ./dist/index.js"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.20"
+  },
+  "dependencies": {
+  }
+}
