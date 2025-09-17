@@ -1,7 +1,7 @@
 import {ask, term, useTerm} from "./cliMenu.js";
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
-import {type Selection, type EngineKind, type TemplateKind, installTemplate} from "./templateEngine.ts";
+import {installTemplate, type Selection, type TemplateKind} from "./templateEngine.ts";
 import * as path from "node:path";
 
 async function doShowMenu(): Promise<Selection | null> {
@@ -18,20 +18,8 @@ async function doShowMenu(): Promise<Selection | null> {
 
         if (!template) return null;
 
-        const engine = await ask<EngineKind>({
-            title: 'Engine to use',
-            choices: [
-                {label: 'Node.js', value: 'node'},
-                {label: 'Bun.js', value: 'bun'}
-            ]
-        });
-
-        if (!engine) return null;
-
         return {
-            template: template.value,
-            options: {engine: engine.value},
-            installDir: process.cwd()
+            template: template.value
         } as Selection;
     });
 
@@ -40,9 +28,8 @@ async function doShowMenu(): Promise<Selection | null> {
     process.stdout.write('\n');
     process.stdout.write(term.color.green('✓ Selected') + '\n');
     process.stdout.write(`Template: ${term.color.cyan(selection.template)}\n`);
-    process.stdout.write(`Engine: ${term.color.cyan(selection.options.engine)}\n`);
     process.stdout.write('\n');
-    process.stdout.write(`You can directly invoke: jopi create ${selection.template} --engine ${selection.options.engine}\n`);
+    process.stdout.write(`You can directly invoke: jopi create ${selection.template}\n`);
 
     return selection;
 }
@@ -76,16 +63,12 @@ async function startUp() {
                 selection = await doShowMenu();
             } else {
                 selection = {
-                    template: argv.template as unknown as TemplateKind,
-                    installDir: path.resolve(argv.dir),
-
-                    options: {
-                        engine: argv.engine as EngineKind
-                    }
+                    template: argv.template as unknown as TemplateKind
                 }
             }
 
             if (selection) {
+                selection.installDir = path.resolve(argv.dir) || process.cwd();
                 await installTemplate(selection);
             }
         })

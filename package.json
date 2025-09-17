@@ -1,6 +1,6 @@
 {
   "name": "jopi",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "license": "MIT",
   "homepage": "https://github.com/johanpiquet/jopi-rewrite",
   "keywords": ["express.js", "nextjs", "react", "react-ssr", "react-hydrate"],
@@ -14,6 +14,7 @@
   "types": "dist/index.d.ts",
   "type": "module",
   "files": [
+    "bin",
     "dist",
     "templates",
     "README.md",
@@ -27,7 +28,7 @@
     "build": "npx tsc",
     "tsc": "npx tsc",
     "bun-publish": "npx tsc && bun publish",
-    "start": "node ./dist/index.js",
+    "start": "node ./dist/index.js --dir ./temp",
     "sampleA": "node ./dist/index.js create minimal --engine bun --dir ./temp"
   },
   "devDependencies": {
