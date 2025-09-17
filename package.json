@@ -15,21 +15,27 @@
   "type": "module",
   "files": [
     "dist",
+    "templates",
     "README.md",
     "LICENSE",
     "src"
   ],
+  "bin": {
+    "jopi": "bin/jopi.js"
+  },
   "scripts": {
     "build": "npx tsc",
     "tsc": "npx tsc",
     "bun-publish": "npx tsc && bun publish",
-    "start": "node ./dist/index.js create api-server --engine bun"
+    "start": "node ./dist/index.js create minimal --engine bun --dir ./temp"
   },
   "devDependencies": {
     "@types/bun": "^1.2.20",
     "@types/yargs": "^17.0.33"
   },
   "dependencies": {
+    "@types/unzipper": "^0.10.11",
+    "unzipper": "^0.12.3",
     "yargs": "^18.0.0"
   }
 }

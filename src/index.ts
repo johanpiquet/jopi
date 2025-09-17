@@ -1,18 +1,8 @@
 import {select, term, useTerm} from "./cliMenu.js";
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
-
-export type TemplateKind = "minimal" | "api-server" | "react-ssr" | "page-router";
-export type EngineKind = "bun" | "node";
-
-export type SubChoices = {
-  engine: EngineKind;
-};
-
-export type Selection = {
-  template: TemplateKind;
-  options: SubChoices;
-}
+import {type Selection, type EngineKind, type TemplateKind, installTemplate} from "./templateEngine.ts";
+import * as path from "node:path";
 
 async function doShowMenu(): Promise<Selection | null> {
     let selection = await useTerm<Selection>(async () => {
@@ -40,9 +30,12 @@ async function doShowMenu(): Promise<Selection | null> {
 
         return {
             template: template.value,
-            options: {engine: engine.value}
+            options: {engine: engine.value},
+            installDir: process.cwd()
         } as Selection;
     });
+
+    if (!selection) return null;
 
     process.stdout.write('\n');
     process.stdout.write(term.color.green('✓ Selected') + '\n');
@@ -52,10 +45,6 @@ async function doShowMenu(): Promise<Selection | null> {
     process.stdout.write(`You can directorly invoke: jopi create ${selection.template} --engine ${selection.options.engine}\n`);
 
     return selection;
-}
-
-function doCreate(selection: Selection) {
-    console.log("selection", selection);
 }
 
 async function startUp() {
@@ -73,6 +62,10 @@ async function startUp() {
                     choices: ['bun', 'node'],
                     default: "node",
                     description: "The engine to use ('bun' or 'node').",
+                }).option("dir", {
+                    type: "string",
+                    description: "The installation directory.",
+                    default: process.cwd()
                 });
         }, async (argv) => {
             let selection: Selection | null;
@@ -82,6 +75,8 @@ async function startUp() {
             } else {
                 selection = {
                     template: argv.template as unknown as TemplateKind,
+                    installDir: path.resolve(argv.dir),
+
                     options: {
                         engine: argv.engine as EngineKind
                     }
@@ -89,7 +84,7 @@ async function startUp() {
             }
 
             if (selection) {
-                doCreate(selection);
+                await installTemplate(selection);
             }
         })
         .demandCommand(1, 'You must specify a valid command.')

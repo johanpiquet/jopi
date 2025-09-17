@@ -30,7 +30,6 @@
   ],
 
   "exclude": [
-    "templates",
     "node_modules",
     "dist",
     "**/*.spec.ts",
