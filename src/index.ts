@@ -1,40 +1,96 @@
-import {jopiApp} from "jopi-rewrite";
+import {ask, term, useTerm} from "./cliMenu.js";
+import yargs from 'yargs';
+import {hideBin} from 'yargs/helpers';
+import {type Selection, type EngineKind, type TemplateKind, installTemplate} from "./templateEngine.ts";
+import * as path from "node:path";
 
-jopiApp.startApp(jopiEasy => {
-    // Create the website.
-    jopiEasy.new_webSite("http://127.0.0.1:3000")
-        // >>> Uncomment to use dev local certificate.
-        //
-        //.add_httpCertificate()
-        //    .generate_localDevCert()
-        //    .DONE_add_httpCertificate()
+async function doShowMenu(): Promise<Selection | null> {
+    let selection = await useTerm<Selection>(async () => {
+        const template = await ask<TemplateKind>({
+            title: 'What template to install',
+            choices: [
+                {label: 'Minimal', value: 'minimal', hint: 'A template with minimal thing'},
+                {label: 'API server', value: 'api-server', hint: 'A sample REST API with JWT auth'},
+                {label: 'React SSR', value: 'react-ssr', hint: 'React SSR using API'},
+                {label: 'Page router', value: 'page-router', hint: 'React SSR using page router'}
+            ]
+        });
 
-        // Catch calls to http://127.0.0.1:3000 and http://127.0.0.1:3000/
-        //
-        .add_path("/")
-            // >>> Sample GET handler
+        if (!template) return null;
 
-            .onGET(async req => {
-                return req.htmlResponse("Return some HTML")
-            })
+        const engine = await ask<EngineKind>({
+            title: 'Engine to use',
+            choices: [
+                {label: 'Node.js', value: 'node'},
+                {label: 'Bun.js', value: 'bun'}
+            ]
+        });
 
+        if (!engine) return null;
 
-            // Like add_path("/")
-            .add_samePath()
+        return {
+            template: template.value,
+            options: {engine: engine.value},
+            installDir: process.cwd()
+        } as Selection;
+    });
 
-            // >>> Sample POST handler
+    if (!selection) return null;
 
-            .onPOST(async req => {
-                const data = req.getReqData(true);
+    process.stdout.write('\n');
+    process.stdout.write(term.color.green('✓ Selected') + '\n');
+    process.stdout.write(`Template: ${term.color.cyan(selection.template)}\n`);
+    process.stdout.write(`Engine: ${term.color.cyan(selection.options.engine)}\n`);
+    process.stdout.write('\n');
+    process.stdout.write(`You can directly invoke: jopi create ${selection.template} --engine ${selection.options.engine}\n`);
 
-                const myResponse = {
-                    in: data,
-                    out: "my response"
-                };
+    return selection;
+}
 
-                return req.jsonResponse(myResponse);
-            })
+async function startUp() {
+    yargs(hideBin(process.argv))
+        // <template> --> arg template is required
+        // [template] --> arg template is optional
+        .command("create [template]", "Create a new project from a template.", (yargs) => {
+            return yargs
+                .positional('template', {
+                    type: 'string',
+                    choices: ['minimal', 'api-server'],
+                    describe: 'The name of the template to use.\nIf not provided, a menu will be shown.',
+                    demandOption: false,
+                })
+                .option('engine', {
+                    type: 'string',
+                    choices: ['bun', 'node'],
+                    default: "node",
+                    description: "The engine to use ('bun' or 'node').",
+                }).option("dir", {
+                    type: "string",
+                    description: "The installation directory.",
+                    default: process.cwd()
+                });
+        }, async (argv) => {
+            let selection: Selection | null;
 
-        // Catch everything else and return a 404 error.
-        .add_path("/**").onGET(async req => req.returnError404_NotFound())
-});
+            if (!argv.template) {
+                selection = await doShowMenu();
+            } else {
+                selection = {
+                    template: argv.template as unknown as TemplateKind,
+                    installDir: path.resolve(argv.dir),
+
+                    options: {
+                        engine: argv.engine as EngineKind
+                    }
+                }
+            }
+
+            if (selection) {
+                await installTemplate(selection);
+            }
+        })
+        .demandCommand(1, 'You must specify a valid command.')
+        .version("1.0").strict().help().parse();
+}
+
+startUp().then();

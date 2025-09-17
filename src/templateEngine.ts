@@ -15,10 +15,6 @@ export type Selection = {
 }
 
 export async function installTemplate(selection: Selection) {
-    console.log("selection", selection);
-
     let templateDir = fileURLToPath(import.meta.resolve("../templates/" + selection.template));
-    console.log("templateDir", templateDir);
-
     await copyDirectory(templateDir, selection.installDir);
 }

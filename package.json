@@ -27,7 +27,8 @@
     "build": "npx tsc",
     "tsc": "npx tsc",
     "bun-publish": "npx tsc && bun publish",
-    "start": "node ./dist/index.js create minimal --engine bun --dir ./temp"
+    "start": "node ./dist/index.js",
+    "sampleA": "node ./dist/index.js create minimal --engine bun --dir ./temp"
   },
   "devDependencies": {
     "@types/bun": "^1.2.20",
