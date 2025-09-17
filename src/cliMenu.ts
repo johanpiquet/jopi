@@ -71,7 +71,7 @@ function renderChoices(choices: Choice[], index: number): string {
     return lines.join('\n');
 }
 
-export async function select<T = string>(opts: Parameter): Promise<Choice<T>> {
+export async function ask<T = string>(opts: Parameter): Promise<Choice<T>> {
     const { title, choices } = opts;
     let index = Math.min(Math.max(opts.initialIndex ?? 0, 0), choices.length - 1);
 
