@@ -1,0 +1,21 @@
+{
+  "name": "my-project",
+  "version": "0.0.1",
+  "private": true,
+
+  "type": "module",
+
+  "scripts": {
+    "build": "npx tsc",
+    "start": "npx jopin ./dist/index.js",
+    "start-bun": "npx jopib src/index.tsx"
+  },
+
+  "devDependencies": {
+    "@types/bun": "^1.2.20"
+  },
+
+  "dependencies": {
+    "jopi-rewrite": "workspace:^2.0.23"
+  }
+}
