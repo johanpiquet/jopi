@@ -35,6 +35,12 @@ jopiApp.startApp(jopiEasy => {
                 return req.jsonResponse(myResponse);
             })
 
-        // Catch everything else and return a 404 error.
-        .add_path("/**").onGET(async req => req.returnError404_NotFound())
+        .DONE_add_path()
+
+        // Set the templates for the pages 404 and 500.
+        //
+        .add_specialPageHandler()
+            .on_404_NotFound(async req => req.reactResponse(<div>404 - Page not found</div>))
+            .on_500_Error(async req => req.reactResponse(<div>500 - Server Error</div>))
+        .END_add_specialPageHandler()
 });

@@ -1,26 +1,23 @@
 import {ask, term, useTerm} from "./cliMenu.js";
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
-import {installTemplate, type Selection, type TemplateKind} from "./templateEngine.ts";
+import {installTemplate, type Selection} from "./templateEngine.ts";
 import * as path from "node:path";
 
 async function doShowMenu(): Promise<Selection | null> {
     let selection = await useTerm<Selection>(async () => {
-        const template = await ask<TemplateKind>({
+        const template = await ask({
             title: 'What template to install',
             choices: [
                 {label: 'Minimal', value: 'minimal', hint: 'A template with minimal thing'},
-                {label: 'API server', value: 'api-server', hint: 'A sample REST API with JWT auth'},
-                {label: 'React SSR', value: 'react-ssr', hint: 'React SSR using API'},
-                {label: 'Page router', value: 'page-router', hint: 'React SSR using page router'}
+                {label: 'React SSR / API', value: 'react-ssr-api', hint: 'React SSR using API and manual declarations'},
+                {label: 'React SSR / Router', value: 'react-ssr-router', hint: 'React SSR using page router / react-router'}
             ]
         });
 
         if (!template) return null;
 
-        return {
-            template: template.value
-        } as Selection;
+        return {template: template.value} as Selection;
     });
 
     if (!selection) return null;
@@ -63,7 +60,7 @@ async function startUp() {
                 selection = await doShowMenu();
             } else {
                 selection = {
-                    template: argv.template as unknown as TemplateKind
+                    template: argv.template
                 }
             }
 
