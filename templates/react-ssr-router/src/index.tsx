@@ -3,7 +3,12 @@ import myUsers from "./myUsers.json?raw";
 
 jopiApp.startApp(jopiEasy => {
     // Create the website.
-    jopiEasy.new_webSite("http://127.0.0.1:3000")
+    // Here we add the capacity to server files.
+    //
+    jopiEasy.new_fileServer("http://127.0.0.1:3000")
+        // ./www is the default directory, so we can skip this line.
+        .set_rootDir("www")
+        .DONE_new_fileServer()
 
         // Enable the page router mechanism.
         // Scan the directory 'reactPages' to discover routes.
@@ -16,6 +21,7 @@ jopiApp.startApp(jopiEasy => {
         // and user info retrieval.
         //
         .add_jwtTokenAuth()
+            // WARNING: you must change this key!
             .step_setPrivateKey("my-private-key")
             .step_setUserStore()
                 .use_simpleLoginPassword()

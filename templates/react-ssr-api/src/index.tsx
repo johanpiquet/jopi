@@ -9,7 +9,12 @@ import myUsers from "./myUsers.json?raw";
 
 jopiApp.startApp(jopiEasy => {
     // Create the website.
-    jopiEasy.new_webSite("http://127.0.0.1:3000")
+    // Here we add the capacity to server files.
+    //
+    jopiEasy.new_fileServer("http://127.0.0.1:3000")
+        // ./www is the default directory, so we can skip this line.
+        .set_rootDir("www")
+        .DONE_new_fileServer()
 
     // >>>> Home page / 404 + 500 page
 
@@ -30,6 +35,14 @@ jopiApp.startApp(jopiEasy => {
             return req.reactResponse(<HomePage />);
         })
 
+        // The ":productName" part allows getting the value of this url segment.
+        // Ex: with "http://127.0.0.1:3000/products/computer/infos
+        //     then productName has the value "computer".
+        //
+        .add_path_GET("/products/:productName/infos", async req => {
+            return req.htmlResponse(`Product name: ${req.urlParts.productName}`);
+        })
+
     // >>>> Manage auth / login part
 
         // Allow handling login.
@@ -45,6 +58,7 @@ jopiApp.startApp(jopiEasy => {
         // and user info retrieval.
         //
         .add_jwtTokenAuth()
+            // WARNING: you must change this key!
             .step_setPrivateKey("my-private-key")
             .step_setUserStore()
                 .use_simpleLoginPassword()

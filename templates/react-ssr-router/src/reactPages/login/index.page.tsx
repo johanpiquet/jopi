@@ -1,5 +1,5 @@
 import React from "react";
-import {logOutUser, useRefresh, useFormSubmit, useUserInfos} from "jopi-rewrite-ui";
+import {logOutUser, useRefresh, useFormSubmit, useUserInfos, usePageTitle} from "jopi-rewrite-ui";
 
 export default function() {
     // Manage user request to logout.
@@ -17,6 +17,9 @@ export default function() {
     // Allows retrieving info about the current logged-in user.
     // It uses the current cookie auth for that.
     const infos = useUserInfos();
+
+    // Set the page title.
+    usePageTitle("Login page");
 
     // > Here we use Tailwind CSS class.
     //   which is automatically enabled and configured.

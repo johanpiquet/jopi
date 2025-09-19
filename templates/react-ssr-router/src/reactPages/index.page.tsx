@@ -9,10 +9,19 @@ import {Link} from "react-router";
 // For practicality, we use SAAS (SCSS) instead.
 //
 import styles from "./index.module.scss";
+import {useCssModule, useOnPageRendering} from "jopi-rewrite-ui";
 
 export default function () {
     // Also to see that our component is alive and responding to events.
     const onClick = () => { alert("Clicked!") };
+
+    // Allows importing the style in the page header.
+    useCssModule(styles);
+
+    // Allows setting the page properties.
+    useOnPageRendering(page => {
+        page.setPageTitle("Welcome!");
+    });
 
     return <div className={styles.myPage}>
         <div>The home page</div>
