@@ -5,7 +5,7 @@ import Page500 from "./Page500.tsx";
 import PageLogin from "./PageLogin.tsx";
 import PageLogin_handlePost from "./PageLogin_handlePost.ts";
 
-import myUsers from "./myUsers.json?raw";
+import myUsers from "./myUsers.json" with { type: "json" };
 
 jopiApp.startApp(jopiEasy => {
     // Create the website.

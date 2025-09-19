@@ -8,7 +8,7 @@
   "scripts": {
     "build": "npx tsc",
     "start": "npx jopin ./dist/index.js",
-    "start-bun": "npx jopib src/index.tsx"
+    "start-bun": "bunx jopib src/index.tsx"
   },
 
   "devDependencies": {
