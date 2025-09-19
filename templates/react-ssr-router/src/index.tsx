@@ -1,7 +1,5 @@
 import {jopiApp} from "jopi-rewrite";
-//import myUsers from "./myUsers.json" with { type: "json" };
-
-const myUsers = [];
+import myUsers from "./myUsers.json" with { type: "json" };
 
 jopiApp.startApp(jopiEasy => {
     // Create the website.
