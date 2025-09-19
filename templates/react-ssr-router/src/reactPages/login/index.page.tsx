@@ -12,7 +12,7 @@ export default function() {
     const refresh = useRefresh();
 
     // Allows making it easier to submit a form.
-    const [submitForm] = useFormSubmit();
+    const [submitForm, formResult] = useFormSubmit();
 
     // Allows retrieving info about the current logged-in user.
     // It uses the current cookie auth for that.
@@ -26,23 +26,32 @@ export default function() {
 
     if (infos) {
         return <div className="w-full flex flex-col items-center justify-center mt-20">
-            <div>You are already logged as: {infos.fullName}</div>
+            <div className="md:w-96 w-80 flex flex-col items-center justify-center">
+                <h2 className="text-4xl text-gray-900 font-medium">Connected</h2>
+                <p className="text-sm text-gray-500/90 mt-3">You are already connected as <strong>{infos.fullName}</strong></p>
             <div onClick={doLogOut}
                  className="mt-8 w-full h-11 rounded-full text-white bg-indigo-500 hover:opacity-90 transition-opacity
                 flex items-center justify-center cursor-pointer">
                 Logout
             </div>
+            </div>
         </div>;
     } else {
+        let isInvalid = formResult && !formResult.isOk;
+
         return <div className="w-full flex flex-col items-center justify-center mt-20">
             <form onSubmit={submitForm}
                   className="md:w-96 w-80 flex flex-col items-center justify-center">
                 <h2 className="text-4xl text-gray-900 font-medium">Sign in</h2>
-                <p className="text-sm text-gray-500/90 mt-3">Welcome back! Please sign in to continue</p>
-                <div className="mt-20"></div>
+                <p className="text-sm text-gray-500/90 mt-3">Please sign in to continue</p>
+
+                {
+                    isInvalid &&
+                    <div className="mt-10 text-red-300">Invalid login or password</div>
+                }
 
                 <div
-                    className="flex items-center w-full bg-transparent border border-gray-300/60 h-12 rounded-full overflow-hidden pl-6 gap-2">
+                    className="flex items-center w-full bg-transparent border border-gray-300/60 h-12 rounded-full overflow-hidden pl-6 gap-2 mt-20">
                     <svg width="16" height="11" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fillRule="evenodd" clipRule="evenodd"
                               d="M0 .55.571 0H15.43l.57.55v9.9l-.571.55H.57L0 10.45zm1.143 1.138V9.9h13.714V1.69l-6.503 4.8h-.697zM13.749 1.1H2.25L8 5.356z"
@@ -64,20 +73,10 @@ export default function() {
                            required defaultValue="mypassword"/>
                 </div>
 
-                <div className="w-full flex items-center justify-between mt-8 text-gray-500/80">
-                    <div className="flex items-center gap-2">
-                        <input name="remember" className="h-5" type="checkbox" id="checkbox"/>
-                        <label className="text-sm" htmlFor="checkbox">Remember me</label>
-                    </div>
-                    <a className="text-sm underline" href="#">Forgot password?</a>
-                </div>
-
                 <button type="submit"
                         className="mt-8 w-full h-11 rounded-full text-white bg-indigo-500 hover:opacity-90 transition-opacity">
                     Login
                 </button>
-                <p className="text-gray-500/90 text-sm mt-4">Don’t have an account? <a
-                    className="text-indigo-400 hover:underline" href="#">Sign up</a></p>
             </form>
         </div>;
     }
