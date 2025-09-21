@@ -16,6 +16,6 @@
   },
 
   "dependencies": {
-    "jopi-rewrite": "workspace:^2.0.23"
+    "jopi-rewrite": "^2.0.23"
   }
 }

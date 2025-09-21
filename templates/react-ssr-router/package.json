@@ -8,6 +8,7 @@
   "scripts": {
     "build": "npx tsc",
     "start": "npx jopin ./dist/index.js",
+    "start-dev": "npx jopin --jopi-dev ./dist/index.js",
     "start-bun": "bunx jopib src/index.tsx"
   },
 
@@ -16,6 +17,6 @@
   },
 
   "dependencies": {
-    "jopi-rewrite": "workspace:^2.0.23"
+    "jopi-rewrite": "^2.0.23"
   }
 }
