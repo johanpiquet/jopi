@@ -23,7 +23,7 @@ async function doShowMenu(): Promise<Selection | null> {
     if (!selection) return null;
 
     process.stdout.write('\n');
-    process.stdout.write(term.color.green('✓ Selected') + '\n');
+    process.stdout.write(term.color.green('✓ Installation done') + '\n');
     process.stdout.write(`Template: ${term.color.cyan(selection.template)}\n`);
     process.stdout.write('\n');
     process.stdout.write(`You can directly invoke: jopi create ${selection.template}\n`);
