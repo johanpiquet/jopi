@@ -1,0 +1,12 @@
+[
+  {
+    "login": "johan@mymail.com",
+    "password": "mypassword",
+    "userInfos": {
+      "id": "johan",
+      "fullName": "Johan P",
+      "email": "johan@mymail.com",
+      "roles": ["admin", "writer"]
+    }
+  }
+]
