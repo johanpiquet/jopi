@@ -12,7 +12,8 @@ async function doShowMenu(): Promise<Selection | null> {
                 {label: 'Minimal', value: 'minimal', hint: 'A template with minimal thing'},
                 {label: 'React SSR / API', value: 'react-ssr-api', hint: 'React SSR using API and manual declarations'},
                 {label: 'React SSR / Router', value: 'react-ssr-router', hint: 'React SSR using page router / react-router'},
-                {label: 'Docker with Bun.js', value: 'docker-bunjs', hint: 'A docker script executing the app with Bun.js'}
+                {label: 'Docker with Bun.js', value: 'docker-bunjs', hint: 'A docker script executing the app with Bun.js'},
+                {label: 'Docker with Node.js', value: 'docker-nodejs', hint: 'A docker script executing the app with Node.js'}
             ]
         });
 
