@@ -22,12 +22,6 @@ async function doShowMenu(): Promise<Selection | null> {
 
     if (!selection) return null;
 
-    process.stdout.write('\n');
-    process.stdout.write(term.color.green('✓ Installation done') + '\n');
-    process.stdout.write(`Template: ${term.color.cyan(selection.template)}\n`);
-    process.stdout.write('\n');
-    process.stdout.write(`You can directly invoke: jopi create ${selection.template}\n`);
-
     return selection;
 }
 
@@ -39,7 +33,6 @@ async function startUp() {
             return yargs
                 .positional('template', {
                     type: 'string',
-                    choices: ['minimal', 'api-server'],
                     describe: 'The name of the template to use.\nIf not provided, a menu will be shown.',
                     demandOption: false,
                 })
@@ -55,8 +48,10 @@ async function startUp() {
                 });
         }, async (argv) => {
             let selection: Selection | null;
+            let isUsingMenu = false;
 
             if (!argv.template) {
+                isUsingMenu = true;
                 selection = await doShowMenu();
             } else {
                 selection = {
@@ -67,6 +62,15 @@ async function startUp() {
             if (selection) {
                 selection.installDir = path.resolve(argv.dir) || process.cwd();
                 await installTemplate(selection);
+
+                process.stdout.write(term.color.green('✓ Installation done') + '\n');
+                process.stdout.write(`Template: ${term.color.cyan(selection.template)}\n`);
+
+                if (isUsingMenu) {
+                    let dir = argv.dir || ".";
+                    process.stdout.write('\n');
+                    process.stdout.write(`You can directly invoke: jopi create ${selection.template} --dir ${dir}\n`);
+                }
             }
         })
         .demandCommand(1, 'You must specify a valid command.')
