@@ -6,7 +6,8 @@
 
   "scripts": {
     "build": "npx tsc",
-    "start": "bunx jopib src/index.tsx"
+    "start": "bunx jopib src/index.tsx",
+    "start-dev": "bunx jopib --jopi-dev src/index.tsx"
   },
 
   "devDependencies": {

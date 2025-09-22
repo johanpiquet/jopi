@@ -28,17 +28,9 @@ bun run build
 bun run start
 ```
 
-## Port binding
+## Ports binding
 
 The file `docker-compose.yml` bind 3 ports to the host: `80` (http), `443` (https) and `3000`.
-
-## Development mode
-
-Jopi Rewrite has a dev mode where source changes are watched and the browser refreshed.
-Currently, this doesn't work, du to limitation to the socket communication process which
-is used internally.
-
-A solution to this matter will be addressed in the next weeks.
-
+The port `5400` is also expose and is used for developpment mode, in order to enable browser automatic refresh.
 
 

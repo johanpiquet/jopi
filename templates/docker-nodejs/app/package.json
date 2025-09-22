@@ -6,7 +6,8 @@
 
   "scripts": {
     "build": "npx tsc",
-    "start": "npx jopin dist/index.js"
+    "start": "npx jopin dist/index.js",
+    "start-dev": "npx jopin --jopi-dev dist/index.js"
   },
 
   "devDependencies": {
