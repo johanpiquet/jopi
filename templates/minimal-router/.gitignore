@@ -1,0 +1,8 @@
+.idea
+node_modules
+temp
+.DS_Store
+logs
+.turbo
+dist
+/tsconfig.tsbuildinfo
