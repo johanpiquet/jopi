@@ -1,7 +1,7 @@
-import {getRouteContext} from "jopi-rewrite";
+import {getRouteServerContext} from "jopi-rewrite";
 import {type LoginPassword} from "jopi-rewrite";
 
-let ctx = getRouteContext();
+let ctx = getRouteServerContext();
 
 ctx.onPOST(async req => {
     const data = await req.getReqData(true);
