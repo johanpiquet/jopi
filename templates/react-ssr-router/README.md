@@ -1,4 +1,4 @@
-A minimal project for Jopi Rewrite with React, using automatic routes.
+A project for Jopi Rewrite with React, using automatic routes.
 
 **Include**
 * JWT Authentification
