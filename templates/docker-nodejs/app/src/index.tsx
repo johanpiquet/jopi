@@ -1,5 +1,4 @@
 import {jopiApp} from "jopi-rewrite";
-import myUsers from "./myUsers.json" with { type: "json" };
 
 jopiApp.startApp(jopiEasy => {
     // Create the website.
@@ -16,17 +15,4 @@ jopiApp.startApp(jopiEasy => {
         // --> Browser Side: enable and configure React Router.
         //
         .enable_reactRouter(import.meta)
-
-        // Add a JWT Token mechanism for user authentification
-        // and user info retrieval.
-        //
-        .add_jwtTokenAuth()
-            // WARNING: you must change this key!
-            .step_setPrivateKey("my-private-key")
-            .step_setUserStore()
-                .use_simpleLoginPassword()
-                    .addMany(myUsers)
-                    .DONE_use_simpleLoginPassword()
-                .DONE_setUserStore()
-            .DONE_add_jwtTokenAuth()
 });

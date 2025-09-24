@@ -1,33 +1,13 @@
 import React from "react";
+import {usePageTitle} from "jopi-rewrite-ui";
 
-// "Link" work on server side and browser side
-// but only when the router is enabled.
-//
-import {Link} from "react-router";
-
-// Here it's a CSS module.
-// For practicality, we use SAAS (SCSS) instead.
-//
-import styles from "./index.module.scss";
-import {useCssModule, useOnPageRendering} from "jopi-rewrite-ui";
+// This file is what is served when consulting page http://127.0.0.1:3000
 
 export default function () {
-    // Also to see that our component is alive and responding to events.
-    const onClick = () => { alert("Clicked!") };
+    usePageTitle("Welcome!");
 
-    // Allows importing the style in the page header.
-    useCssModule(styles);
-
-    // Allows setting the page properties.
-    useOnPageRendering(page => {
-        page.setPageTitle("Welcome!");
-    });
-
-    return <div className={styles.myPage}>
-        <div>The home page</div>
-        <div className={styles.myButton} onClick={onClick}>Click me</div>
-
-        <Link className={styles.myButton} to="/login">Go to login page</Link>
-        <Link className={styles.myButton} to="/products">Go to products page</Link>
+    return <div className="flex flex-col items-center m-20">
+        <div className="text-gray-500">The home page</div>
+        <div className="text-red-300">Welcome !</div>
     </div>
 }

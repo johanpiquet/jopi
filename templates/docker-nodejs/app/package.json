@@ -6,6 +6,7 @@
 
   "scripts": {
     "build": "npx tsc",
+    "jopiWatch_node": "npx tsc",
     "start": "npx jopin dist/index.js",
     "start-dev": "npx jopin --jopi-dev dist/index.js"
   },

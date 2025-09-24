@@ -1,14 +1,13 @@
-import {isServerSide} from "jopi-rewrite-ui";
-import {Link} from "react-router";
+import React from "react";
+import {usePageTitle} from "jopi-rewrite-ui";
 
-export default function() {
-    if (isServerSide()) {
-        console.log("Products: server side render");
-    }
+// This file is what is served when consulting page http://127.0.0.1:3000/products
 
-    return <div>
-        <div>Listing page</div>
-        <div><Link to="productA/details">Product A</Link></div>
-        <div><Link to="productB/details">Product B</Link></div>
-    </div>;
+export default function () {
+    usePageTitle("Products");
+
+    return <div className="flex flex-col items-center m-20">
+        <div className="text-gray-500">The product page</div>
+        <div className="text-red-300">TODO: add plenty of great products!</div>
+    </div>
 }
