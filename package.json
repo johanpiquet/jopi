@@ -1,6 +1,6 @@
 {
   "name": "jopi",
-  "version": "0.0.13",
+  "version": "0.0.16",
   "license": "MIT",
   "homepage": "https://github.com/johanpiquet/jopi-rewrite",
   "keywords": ["express.js", "nextjs", "react", "react-ssr", "react-hydrate"],
@@ -40,5 +40,5 @@
     "unzipper": "^0.12.3",
     "yargs": "^18.0.0"
   },
-  "jopiMono_MustIgnoreDependencies": true,"publishedDate": "9/24/2025","publicPublishedDate": "9/24/2025"
+  "jopiMono_MustIgnoreDependencies": true,"publishedDate": "9/25/2025","publicPublishedDate": "9/25/2025"
 }
