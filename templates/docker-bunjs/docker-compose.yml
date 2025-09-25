@@ -13,7 +13,4 @@ services:
       - "3000:3000"
       - "5400:5400"
 
-    environment:
-      - JOPIN_WEBSOCKET_PORT=5400
-
     command: sh -c "chmod +x ./start.sh && ./start.sh"
