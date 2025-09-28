@@ -1,6 +1,6 @@
 import {jopiApp} from "jopi-rewrite";
 
-jopiApp.startApp(jopiEasy => {
+jopiApp.startApp(import.meta, jopiEasy => {
     // Create the website.
     // Here we add the capacity to server files.
     //
@@ -14,5 +14,5 @@ jopiApp.startApp(jopiEasy => {
         // --> Server Side: use the directory path to build routes.
         // --> Browser Side: enable and configure React Router.
         //
-        .enable_reactRouter(import.meta)
+        .enable_reactRouter();
 });

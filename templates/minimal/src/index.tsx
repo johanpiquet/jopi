@@ -1,6 +1,6 @@
 import {jopiApp} from "jopi-rewrite";
 
-jopiApp.startApp(jopiEasy => {
+jopiApp.startApp(import.meta, jopiEasy => {
     // Create the website.
     jopiEasy.new_webSite("http://127.0.0.1:3000")
         // >>> Uncomment to use dev local certificate.

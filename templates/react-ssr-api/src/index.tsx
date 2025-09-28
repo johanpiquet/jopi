@@ -7,7 +7,7 @@ import PageLogin_handlePost from "./PageLogin_handlePost.ts";
 
 import myUsers from "./myUsers.json" with { type: "json" };
 
-jopiApp.startApp(jopiEasy => {
+jopiApp.startApp(import.meta, jopiEasy => {
     // Create the website.
     // Here we add the capacity to server files.
     //
