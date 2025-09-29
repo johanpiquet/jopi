@@ -1,6 +1,6 @@
 {
   "name": "jopi",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "license": "MIT",
   "homepage": "https://github.com/johanpiquet/jopi-rewrite",
   "keywords": ["express.js", "nextjs", "react", "react-ssr", "react-hydrate"],
@@ -29,7 +29,7 @@
     "tsc": "npx tsc",
     "bun-publish": "npx tsc && bun publish",
     "start": "node ./dist/index.js create --dir ./temp",
-    "sampleA": "node ./dist/index.js create minimal-router --dir ./temp/minir"
+    "clean": "rm -rf ./dist; rm -rf .turbo; rm tsconfig.tsbuildinfo"
   },
   "devDependencies": {
     "@types/bun": "^1.2.20",
@@ -40,5 +40,5 @@
     "unzipper": "^0.12.3",
     "yargs": "^18.0.0"
   },
-  "jopiMono_MustIgnoreDependencies": true,"publishedDate": "9/25/2025","publicPublishedDate": "9/25/2025"
+  "publishedDate": "9/29/2025","publicPublishedDate": "9/25/2025"
 }
