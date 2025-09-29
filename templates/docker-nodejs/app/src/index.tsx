@@ -10,9 +10,9 @@ jopiApp.startApp(import.meta, jopiEasy => {
         .DONE_new_fileServer()
 
         // Enable the page router mechanism.
-        // Scan the directory 'reactPages' to discover routes.
+        // Scan the directory 'routes' to discover routes.
         // --> Server Side: use the directory path to build routes.
         // --> Browser Side: enable and configure React Router.
         //
-        .enable_reactRouter()
+        .enable_automaticRoutes()
 });
