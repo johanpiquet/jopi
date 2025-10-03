@@ -1,5 +1,5 @@
 import React from "react";
-import {logOutUser, useRefresh, useFormSubmit, useUserInfos, usePageTitle} from "jopi-rewrite-ui";
+import {useLogOutUser, useRefresh, useFormSubmit, useUserInfos, usePageTitle} from "jopi-rewrite-ui";
 
 export default function() {
     // Manage user request to logout.
@@ -7,6 +7,9 @@ export default function() {
         logOutUser();
         refresh();
     };
+
+    // Allow disconnection of the user.
+    const logOutUser = useLogOutUser();
 
     // Will allow forcing a refresh of the component.
     const refresh = useRefresh();
