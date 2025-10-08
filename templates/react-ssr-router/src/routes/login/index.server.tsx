@@ -1,16 +1,15 @@
-import {getRouteServerContext} from "jopi-rewrite";
-import {type LoginPassword} from "jopi-rewrite";
+import {type LoginPassword, RouteServerContext} from "jopi-rewrite";
 
-let ctx = getRouteServerContext();
+export default function(ctx: RouteServerContext) {
+    ctx.onPOST(async req => {
+        const data = await req.getReqData({ignoreUrl: true});
+        console.log("Post data:", data);
 
-ctx.onPOST(async req => {
-    const data = await req.getReqData(true);
-    console.log("Post data:", data);
+        let authResult = await req.tryAuthWithJWT(data as LoginPassword);
 
-    let authResult = await req.tryAuthWithJWT(data as LoginPassword);
-
-    return req.jsonResponse({
-        isOk: authResult.isOk,
-        authResult: authResult
+        return req.jsonResponse({
+            isOk: authResult.isOk,
+            authResult: authResult
+        });
     });
-});
+}
