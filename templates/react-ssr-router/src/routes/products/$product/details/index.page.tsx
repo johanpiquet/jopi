@@ -1,4 +1,4 @@
-import {isServerSide, usePageParams} from "jopi-rewrite-ui";
+import {isServerSide, usePageParams} from "jopi-rewrite/ui";
 
 export default function() {
     let params = usePageParams();

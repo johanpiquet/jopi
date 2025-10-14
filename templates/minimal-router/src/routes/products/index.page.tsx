@@ -1,5 +1,5 @@
 import React from "react";
-import {usePageTitle} from "jopi-rewrite-ui";
+import {usePageTitle} from "jopi-rewrite/ui";
 
 // This file is what is served when consulting page http://127.0.0.1:3000/products
 

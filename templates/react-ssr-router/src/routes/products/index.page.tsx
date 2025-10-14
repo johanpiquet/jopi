@@ -1,4 +1,4 @@
-import {isServerSide} from "jopi-rewrite-ui";
+import {isServerSide} from "jopi-rewrite/ui";
 import {Link} from "react-router";
 
 export default function() {

@@ -1,5 +1,5 @@
 import React from "react";
-import {mustHydrate, useRefresh, useFormSubmit, useUserInfos, usePageTitle, useLogOutUser} from "jopi-rewrite-ui";
+import {mustHydrate, useRefresh, useFormSubmit, useUserInfos, usePageTitle, useLogOutUser} from "jopi-rewrite/ui";
 
 function MyPage() {
     // Manage user request to logout.
