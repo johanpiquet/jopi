@@ -31,7 +31,7 @@
     "clean": "rm -rf ./dist; rm -rf .turbo; rm tsconfig.tsbuildinfo"
   },
   "devDependencies": {
-    "@types/bun": "^1.2.20",
+    "@types/bun": "latest",
     "@types/yargs": "^17.0.33"
   },
   "dependencies": {
