@@ -28,7 +28,7 @@
     "tsc": "npx tsc",
     "bun-publish": "npx tsc && bun publish",
     "start": "node ./dist/index.js create --dir ./temp",
-    "clean": "rm -rf ./dist; rm -rf .turbo; rm tsconfig.tsbuildinfo"
+    "clean": "rm -rf ./dist .turbo tsconfig.tsbuildinfo"
   },
   "devDependencies": {
     "@types/bun": "latest",
