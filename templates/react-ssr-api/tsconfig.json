@@ -22,7 +22,7 @@
     "verbatimModuleSyntax": true,
     "allowJs": false,
 
-    "types": ["@jopi-loader/types"]
+    "types": ["jopi-rewrite/types"]
   },
 
   "include": [
