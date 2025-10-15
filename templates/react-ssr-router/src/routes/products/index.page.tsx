@@ -2,7 +2,7 @@ import {isServerSide} from "jopi-rewrite/ui";
 import {Link} from "react-router";
 
 export default function() {
-    if (isServerSide()) {
+    if (isServerSide) {
         console.log("Products: server side render");
     }
 

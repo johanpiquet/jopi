@@ -3,7 +3,7 @@ import {isServerSide, usePageParams} from "jopi-rewrite/ui";
 export default function() {
     let params = usePageParams();
 
-    if (isServerSide()) {
+    if (isServerSide) {
         console.log("Details: server side render", params.product);
     }
 
