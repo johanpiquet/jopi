@@ -1,6 +1,6 @@
 import React from "react";
-import {usePageTitle} from "jopi-rewrite/ui";
-import {useLogOutUser, useRefresh, useFormSubmit, useUserInfos} from "jopi-rewrite/uikit";
+import {usePageTitle} from "jopi-rewrite/uikit";
+import {usePageTitle, useLogOutUser, useRefresh, useFormSubmit, useUserInfos} from "jopi-rewrite/uikit";
 
 export default function() {
     // Manage user request to logout.

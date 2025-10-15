@@ -1,5 +1,5 @@
 import React from "react";
-import {mustHydrate} from "jopi-rewrite/ui";
+import {mustHydrate} from "jopi-rewrite/uikit";
 
 // Here it's a CSS module.
 // For practicality, we use SAAS (SCSS) instead.
