@@ -126,6 +126,5 @@ async function executeProjectInstaller(project: ProjectItem, selection: Selected
 }
 
 async function installProjectSources(project: ProjectItem, installDir: string) {
-    await ns_fs.mkDir(installDir);
-    await downloadDir( project.template + "/project", ".");
+    await downloadDir(project.template + "/project", installDir);
 }
