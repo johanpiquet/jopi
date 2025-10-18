@@ -1,1 +1,0 @@
-A minimal project for Jopi Rewrite with React, using automatic routes.

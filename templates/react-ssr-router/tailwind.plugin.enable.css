@@ -1,7 +1,0 @@
-/*
-   This file is require in order to enable the tailwind plugin of WebStorm.
-   His only role is to enable this plugin.
-   --> His name has no meaning (need .css only).
-   --> Is required since Tailwind 4 (v3 needed a config file).
-*/
-@import "tailwindcss";
