@@ -3,7 +3,13 @@
   "version": "0.0.17",
   "license": "MIT",
   "homepage": "https://github.com/johanpiquet/jopi-rewrite",
-  "keywords": ["express.js", "nextjs", "react", "react-ssr", "react-hydrate"],
+  "keywords": [
+    "express.js",
+    "nextjs",
+    "react",
+    "react-ssr",
+    "react-hydrate"
+  ],
   "author": "Johan PIQUET",
   "description": "Admin tools for Jopi Rewrite",
   "engines": {
@@ -27,7 +33,7 @@
     "build": "npx tsc",
     "tsc": "npx tsc",
     "bun-publish": "npx tsc && bun publish",
-    "start": "node ./dist/index.js create --dir ./temp",
+    "start": "node ./dist/index.js init --dir ./temp --template reactServerSide_Tailwind --shadcn --uikit",
     "clean": "rm -rf ./dist .turbo tsconfig.tsbuildinfo"
   },
   "devDependencies": {
@@ -35,9 +41,14 @@
     "@types/yargs": "^17.0.33"
   },
   "dependencies": {
+    "@inquirer/prompts": "^7.9.0",
     "@types/unzipper": "^0.10.11",
+    "dotenv": "^17.2.3",
+    "gitpick": "^4.12.2",
+    "jopi-node-space": "*",
     "unzipper": "^0.12.3",
     "yargs": "^18.0.0"
   },
-  "publishedDate": "9/29/2025","publicPublishedDate": "9/25/2025"
+  "publishedDate": "9/29/2025",
+  "publicPublishedDate": "9/25/2025"
 }

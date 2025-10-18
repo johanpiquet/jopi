@@ -41,16 +41,20 @@ export async function copyDirectory(srcDir: string, destDir: string): Promise<vo
         if (entry.isDirectory()) {
             await copyDirectory(srcPath, destPath);
         } else {
-            return new Promise<void>((resolve, reject) => {
-                const readStream = fs.createReadStream(srcPath);
-                const writeStream = fs.createWriteStream(destPath);
-
-                readStream.on('error', reject);
-                writeStream.on('error', reject);
-                writeStream.on('finish', resolve);
-
-                readStream.pipe(writeStream);
-            });
+            return copyFile(srcPath, destPath);
         }
     }));
+}
+
+export async function copyFile(srcPath: string, destPath: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        const readStream = fs.createReadStream(srcPath);
+        const writeStream = fs.createWriteStream(destPath);
+
+        readStream.on('error', reject);
+        writeStream.on('error', reject);
+        writeStream.on('finish', resolve);
+
+        readStream.pipe(writeStream);
+    });
 }
