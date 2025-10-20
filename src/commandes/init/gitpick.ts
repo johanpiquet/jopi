@@ -1,7 +1,7 @@
 import {findPackageJSON} from "node:module";
 import * as path from "node:path";
 import {execFile} from "node:child_process";
-import * as ns_fs from "jopi-toolkit/ns_fs";
+import * as jk_fs from "jopi-toolkit/jk_fs";
 import process from "node:process";
 import {term} from "../../common.js";
 import {copyDirectory, copyFile} from "../../templateTools.js";
@@ -38,10 +38,10 @@ export async function downloadFile(internalPath: string, outputPath: string): Pr
         return copyThisFile(internalPath, outputPath);
     }
 
-    await ns_fs.unlink(outputPath);
+    await jk_fs.unlink(outputPath);
 
-    let dirPath = ns_fs.dirname(outputPath);
-    let fileName = ns_fs.basename(outputPath);
+    let dirPath = jk_fs.dirname(outputPath);
+    let fileName = jk_fs.basename(outputPath);
 
     let resUrl = GITHUB_URL + "blob/main/projects_v2/" + internalPath;
     let isOk = await executeGitPick(dirPath, [resUrl, fileName]);
@@ -57,9 +57,9 @@ export async function downloadDir(internalPath: string, outputDir: string): Prom
         return copyThisDir(internalPath, outputDir);
     }
 
-    outputDir = ns_fs.resolve(outputDir);
-    await ns_fs.rmDir(outputDir);
-    await ns_fs.mkDir(outputDir);
+    outputDir = jk_fs.resolve(outputDir);
+    await jk_fs.rmDir(outputDir);
+    await jk_fs.mkDir(outputDir);
 
     let resUrl = GITHUB_URL + "tree/main/projects_v2/" + internalPath;
     let isOk = await executeGitPick(outputDir, [resUrl, "."]);
@@ -72,7 +72,7 @@ export async function downloadDir(internalPath: string, outputDir: string): Prom
 
 async function copyThisFile(internalPath: string, outputPath: string): Promise<void> {
     let baseDir = process.env.JOPI_INIT_USE_DEV_DIR!;
-    internalPath = ns_fs.resolve(baseDir, internalPath);
+    internalPath = jk_fs.resolve(baseDir, internalPath);
     console.log("Dev mode - Cloning file: ", internalPath);
 
     return copyFile(internalPath, outputPath);
@@ -80,7 +80,7 @@ async function copyThisFile(internalPath: string, outputPath: string): Promise<v
 
 async function copyThisDir(internalPath: string, outputDir: string): Promise<void> {
     let baseDir = process.env.JOPI_INIT_USE_DEV_DIR!;
-    internalPath = ns_fs.resolve(baseDir, internalPath);
+    internalPath = jk_fs.resolve(baseDir, internalPath);
     console.log("Dev mode - Cloning dir: ", internalPath);
 
     return copyDirectory(internalPath, outputDir);

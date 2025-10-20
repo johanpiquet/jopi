@@ -2,7 +2,7 @@ import {term} from "../../common.ts";
 import {showMenu_SelectTemplate} from "./menu.ts";
 import {getProjectList, type ProjectItem} from "./github.ts";
 import * as process from "node:process";
-import * as ns_fs from "jopi-toolkit/ns_fs";
+import * as jk_fs from "jopi-toolkit/jk_fs";
 import {downloadDir, downloadFile} from "./gitpick.js";
 import {config} from "dotenv";
 
@@ -56,7 +56,7 @@ export default async function(argv: CommandOptions_Init) {
     }
 
     if (argv.dir) {
-        selection.installDir = ns_fs.resolve(argv.dir);
+        selection.installDir = jk_fs.resolve(argv.dir);
     } else {
         selection.installDir = process.cwd();
     }
@@ -93,11 +93,11 @@ export default async function(argv: CommandOptions_Init) {
 async function executeProjectInstaller(project: ProjectItem, selection: SelectedTemplate) {
     //region Downloads the script
 
-    let installDir = ns_fs.join(import.meta.dirname, "temp");
-    let filePath = ns_fs.join(installDir, "install.js");
+    let installDir = jk_fs.join(import.meta.dirname, "temp");
+    let filePath = jk_fs.join(installDir, "install.js");
 
-    await ns_fs.mkDir(installDir);
-    await ns_fs.unlink(filePath);
+    await jk_fs.mkDir(installDir);
+    await jk_fs.unlink(filePath);
 
     await downloadFile(project.template + "/install/index.js", filePath);
 

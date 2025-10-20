@@ -1,5 +1,5 @@
 import {downloadFile} from "./gitpick.js";
-import * as ns_fs from "jopi-toolkit/ns_fs";
+import * as jk_fs from "jopi-toolkit/jk_fs";
 
 //region project.json file format
 
@@ -31,11 +31,11 @@ const ONE_HOUR = 1000 * 60 * 60;
 const ENABLE_CACHE = false;
 
 async function updateProjectsList(): Promise<string> {
-    let filePath = ns_fs.resolve(import.meta.dirname, "projects.json");
+    let filePath = jk_fs.resolve(import.meta.dirname, "projects.json");
     let mustDownload = true;
 
     if (ENABLE_CACHE) {
-        let stats = await ns_fs.getFileStat(filePath);
+        let stats = await jk_fs.getFileStat(filePath);
 
         if (stats) {
             let now = Date.now();
@@ -47,7 +47,7 @@ async function updateProjectsList(): Promise<string> {
     }
 
     if (mustDownload) {
-        await ns_fs.unlink(filePath);
+        await jk_fs.unlink(filePath);
         console.log("Uploading projects list...")
         await downloadFile("projects.json", filePath);
     }
@@ -61,7 +61,7 @@ export async function getProjectList(): Promise<ProjectFile> {
     if (gProjectList) return gProjectList;
 
     let filePath = await updateProjectsList();
-    return gProjectList = JSON.parse(await ns_fs.readTextFromFile(filePath));
+    return gProjectList = JSON.parse(await jk_fs.readTextFromFile(filePath));
 }
 
 //endregion
