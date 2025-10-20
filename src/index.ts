@@ -1,9 +1,15 @@
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
+import * as jk_tools from "jopi-toolkit/jk_tools";
+import * as jk_term from "jopi-toolkit/jk_term";
 
 import commandInit, {type CommandOptions_Init} from "./commandes/init/index.ts";
 
 yargs(hideBin(process.argv))
+    .command("uid", "Print a new UID", ()=> {} , ()=> {
+        jk_tools.generateUUIDv4();
+        console.log("New UID:", jk_term.textBgRed(jk_tools.generateUUIDv4()))
+    })
     .command("init [template]", "Initialize a new project from a template.", (yargs) => {
         return yargs
             .positional('template', {
