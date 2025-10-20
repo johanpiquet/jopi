@@ -1,5 +1,5 @@
 import {downloadFile} from "./gitpick.js";
-import * as ns_fs from "jopi-node-space/ns_fs";
+import * as ns_fs from "jopi-toolkit/ns_fs";
 
 //region project.json file format
 

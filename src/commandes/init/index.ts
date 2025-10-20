@@ -2,7 +2,7 @@ import {term} from "../../common.ts";
 import {showMenu_SelectTemplate} from "./menu.ts";
 import {getProjectList, type ProjectItem} from "./github.ts";
 import * as process from "node:process";
-import * as ns_fs from "jopi-node-space/ns_fs";
+import * as ns_fs from "jopi-toolkit/ns_fs";
 import {downloadDir, downloadFile} from "./gitpick.js";
 import {config} from "dotenv";
 

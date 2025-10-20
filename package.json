@@ -45,7 +45,7 @@
     "@types/unzipper": "^0.10.11",
     "dotenv": "^17.2.3",
     "gitpick": "^4.12.2",
-    "jopi-node-space": "*",
+    "jopi-toolkit": "*",
     "unzipper": "^0.12.3",
     "yargs": "^18.0.0"
   },

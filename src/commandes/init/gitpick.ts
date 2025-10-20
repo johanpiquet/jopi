@@ -1,7 +1,7 @@
 import {findPackageJSON} from "node:module";
 import * as path from "node:path";
 import {execFile} from "node:child_process";
-import * as ns_fs from "jopi-node-space/ns_fs";
+import * as ns_fs from "jopi-toolkit/ns_fs";
 import process from "node:process";
 import {term} from "../../common.js";
 import {copyDirectory, copyFile} from "../../templateTools.js";
