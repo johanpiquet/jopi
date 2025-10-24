@@ -6,9 +6,6 @@ import commandUID from "./commandes/uid/index.ts";
 import commandLinker from "./commandes/linker/index.ts";
 
 yargs(hideBin(process.argv))
-    .command("linker", "Execute the module linker", ()=> {} , async ()=> {
-        await commandLinker();
-    })
     .command("uid", "Print a new UID", ()=> {} , ()=> {
         commandUID();
     })
