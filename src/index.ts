@@ -3,7 +3,6 @@ import {hideBin} from 'yargs/helpers';
 
 import commandInit, {type CommandOptions_Init} from "./commandes/init/index.ts";
 import commandUID from "./commandes/uid/index.ts";
-import commandLinker from "./commandes/linker/index.ts";
 
 yargs(hideBin(process.argv))
     .command("uid", "Print a new UID", ()=> {} , ()=> {
