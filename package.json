@@ -1,6 +1,6 @@
 {
   "name": "jopi",
-  "version": "0.0.17",
+  "version": "2.0.8",
   "license": "MIT",
   "homepage": "https://github.com/johanpiquet/jopi-rewrite",
   "keywords": [
@@ -15,12 +15,18 @@
   "engines": {
     "node": ">=22.18.0"
   },
-  "types": "dist/index.d.ts",
-  ".": {
-    "default": "./dist/index.js",
-    "bun": "./src/index.ts"
-  },
+
   "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "bun": "./src/index.ts"
+    }
+  },
+
   "files": [
     "bin",
     "dist",
@@ -30,11 +36,12 @@
     "src"
   ],
   "bin": "bin/jopi.js",
+
   "scripts": {
     "build": "npx tsc",
     "tsc": "npx tsc",
     "bun-publish": "npx tsc && bun publish",
-    "start": "node ./dist/index.js init --dir ./temp --template reactServerSide_Tailwind --shadcn --uikit",
+    "start": "node ./dist/index.js init --dir ./temp",
     "clean": "rm -rf ./dist .turbo tsconfig.tsbuildinfo"
   },
   "devDependencies": {
@@ -50,6 +57,6 @@
     "unzipper": "^0.12.3",
     "yargs": "^18.0.0"
   },
-  "publishedDate": "9/29/2025",
+  "publishedDate": "11/14/2025",
   "publicPublishedDate": "9/25/2025"
 }
