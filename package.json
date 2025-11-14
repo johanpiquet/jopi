@@ -16,12 +16,10 @@
     "node": ">=22.18.0"
   },
   "types": "dist/index.d.ts",
-
   ".": {
     "default": "./dist/index.js",
     "bun": "./src/index.ts"
   },
-
   "type": "module",
   "files": [
     "bin",
@@ -31,9 +29,7 @@
     "LICENSE",
     "src"
   ],
-  "bin": {
-    "jopi": "bin/jopi.js"
-  },
+  "bin": "bin/jopi.js",
   "scripts": {
     "build": "npx tsc",
     "tsc": "npx tsc",
