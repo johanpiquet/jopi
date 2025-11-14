@@ -1,6 +1,6 @@
 {
   "name": "jopi",
-  "version": "2.0.8",
+  "version": "2.0.10",
   "license": "MIT",
   "homepage": "https://github.com/johanpiquet/jopi-rewrite",
   "keywords": [
@@ -15,18 +15,15 @@
   "engines": {
     "node": ">=22.18.0"
   },
-
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-
   "exports": {
     ".": {
       "default": "./dist/index.js",
       "bun": "./src/index.ts"
     }
   },
-
   "files": [
     "bin",
     "dist",
@@ -36,7 +33,6 @@
     "src"
   ],
   "bin": "bin/jopi.js",
-
   "scripts": {
     "build": "npx tsc",
     "tsc": "npx tsc",
