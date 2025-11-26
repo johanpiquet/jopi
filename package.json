@@ -2,7 +2,7 @@
   "name": "jopi",
   "version": "2.0.11",
   "license": "MIT",
-  "homepage": "https://github.com/johanpiquet/jopi-rewrite",
+  "homepage": "https://github.com/johanpiquet/jopijs",
   "keywords": [
     "express.js",
     "nextjs",
