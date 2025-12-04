@@ -1,59 +1,26 @@
-import {findPackageJSON} from "node:module";
-import * as path from "node:path";
-import {execFile} from "node:child_process";
 import * as jk_fs from "jopi-toolkit/jk_fs";
 import process from "node:process";
-import {term} from "../../common.js";
 import {copyDirectory, copyFile} from "../../templateTools.js";
+import {githubDownload} from "jopi-toolkit/jk_tools";
 
-const GITHUB_URL = "https://github.com/johanpiquet/jopiProjectTemplates/";
-
-async function executeGitPick(cwd: string, params: string[]): Promise<boolean> {
-    let gitPickDir = findPackageJSON("gitpick", import.meta.url);
-    if (!gitPickDir) return false;
-    gitPickDir = path.dirname(gitPickDir);
-
-    let gitPickEntryPoint = path.join(gitPickDir, "dist", "index.js");
-    let nodePath = process.argv[0];
-
-    let args: string[] = [gitPickEntryPoint, "--", ...params];
-
-    const pr = new Promise<boolean>((resolve) => {
-        execFile(nodePath, args, {cwd}, (error, _stdout, _stderr) => {
-            if (error) {
-                console.log(_stdout);
-                console.log(_stderr);
-                return resolve(false);
-            }
-
-            resolve(true);
-        });
-    })
-
-    return await pr;
-}
+const GITHUB_URL = "https://github.com/johanpiquet/jopiProjectTemplates";
 
 export async function downloadFile(internalPath: string, outputPath: string): Promise<void> {
-    if (process.env.JOPI_INIT_USE_DEV_DIR) {
+    if (gLocalDevDir) {
         return copyThisFile(internalPath, outputPath);
     }
 
     await jk_fs.unlink(outputPath);
 
-    let dirPath = jk_fs.dirname(outputPath);
-    let fileName = jk_fs.basename(outputPath);
-
-    let resUrl = GITHUB_URL + "blob/main/projects_v2/" + internalPath;
-    let isOk = await executeGitPick(dirPath, [resUrl, fileName]);
-
-    if (!isOk) {
-        process.stderr.write(term.color.red(`⚠️ Error: github file not found '${resUrl}'\n`));
-        process.exit(1);
-    }
+    await githubDownload({
+        url: GITHUB_URL + "/tree/main/projects_v2/" + internalPath,
+        downloadPath: outputPath,
+        log: false
+    });
 }
 
 export async function downloadDir(internalPath: string, outputDir: string): Promise<void> {
-    if (process.env.JOPI_INIT_USE_DEV_DIR) {
+    if (gLocalDevDir) {
         return copyThisDir(internalPath, outputDir);
     }
 
@@ -61,27 +28,32 @@ export async function downloadDir(internalPath: string, outputDir: string): Prom
     await jk_fs.rmDir(outputDir);
     await jk_fs.mkDir(outputDir);
 
-    let resUrl = GITHUB_URL + "tree/main/projects_v2/" + internalPath;
-    let isOk = await executeGitPick(outputDir, [resUrl, "."]);
-
-    if (!isOk) {
-        process.stderr.write(term.color.red(`⚠️ Error: github dir not found '${resUrl}'\n`));
-        process.exit(1);
-    }
+    await githubDownload({
+        url: GITHUB_URL + "/tree/main/projects_v2/" + internalPath,
+        downloadPath: outputDir,
+        log: false
+    });
 }
 
 async function copyThisFile(internalPath: string, outputPath: string): Promise<void> {
-    let baseDir = process.env.JOPI_INIT_USE_DEV_DIR!;
-    internalPath = jk_fs.resolve(baseDir, internalPath);
+    internalPath = jk_fs.resolve(gLocalDevDir!, internalPath);
     console.log("Dev mode - Cloning file: ", internalPath);
 
     return copyFile(internalPath, outputPath);
 }
 
 async function copyThisDir(internalPath: string, outputDir: string): Promise<void> {
-    let baseDir = process.env.JOPI_INIT_USE_DEV_DIR!;
-    internalPath = jk_fs.resolve(baseDir, internalPath);
+    internalPath = jk_fs.resolve(gLocalDevDir!, internalPath);
     console.log("Dev mode - Cloning dir: ", internalPath);
 
     return copyDirectory(internalPath, outputDir);
 }
+
+function getLocalDevDir(): string|undefined {
+    let v = process.env.JOPI_INIT_USE_DEV_DIR;
+    if (!v) return undefined;
+    if (v==="0") return undefined;
+    return v;
+}
+
+const gLocalDevDir = getLocalDevDir();

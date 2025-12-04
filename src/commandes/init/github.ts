@@ -1,4 +1,4 @@
-import {downloadFile} from "./gitpick.js";
+import {downloadFile} from "./gitpick.ts";
 import * as jk_fs from "jopi-toolkit/jk_fs";
 
 //region project.json file format
@@ -27,9 +27,6 @@ export interface ProjectOptions {
 
 //region Getting the project list
 
-const ONE_HOUR = 1000 * 60 * 60;
-const ENABLE_CACHE = false;
-
 async function updateProjectsList(): Promise<string> {
     let filePath = jk_fs.resolve(import.meta.dirname, "projects.json");
     let mustDownload = true;
@@ -55,13 +52,15 @@ async function updateProjectsList(): Promise<string> {
     return filePath;
 }
 
-let gProjectList: ProjectFile | undefined;
-
 export async function getProjectList(): Promise<ProjectFile> {
     if (gProjectList) return gProjectList;
 
     let filePath = await updateProjectsList();
     return gProjectList = JSON.parse(await jk_fs.readTextFromFile(filePath));
 }
+
+const ONE_HOUR = 1000 * 60 * 60;
+const ENABLE_CACHE = false;
+let gProjectList: ProjectFile | undefined;
 
 //endregion
