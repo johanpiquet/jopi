@@ -1,13 +1,12 @@
 import * as jk_fs from "jopi-toolkit/jk_fs";
 import process from "node:process";
-import {copyDirectory, copyFile} from "../../templateTools.js";
 import {githubDownload} from "jopi-toolkit/jk_tools";
 
 const GITHUB_URL = "https://github.com/johanpiquet/jopiProjectTemplates";
 
 export async function downloadFile(internalPath: string, outputPath: string): Promise<void> {
     if (gLocalDevDir) {
-        return copyThisFile(internalPath, outputPath);
+        return jk_fs.copyFile(internalPath, outputPath);
     }
 
     await jk_fs.unlink(outputPath);
@@ -21,7 +20,7 @@ export async function downloadFile(internalPath: string, outputPath: string): Pr
 
 export async function downloadDir(internalPath: string, outputDir: string): Promise<void> {
     if (gLocalDevDir) {
-        return copyThisDir(internalPath, outputDir);
+        return jk_fs.copyDirectory(internalPath, outputDir);
     }
 
     outputDir = jk_fs.resolve(outputDir);
@@ -33,20 +32,6 @@ export async function downloadDir(internalPath: string, outputDir: string): Prom
         downloadPath: outputDir,
         log: false
     });
-}
-
-async function copyThisFile(internalPath: string, outputPath: string): Promise<void> {
-    internalPath = jk_fs.resolve(gLocalDevDir!, internalPath);
-    console.log("Dev mode - Cloning file: ", internalPath);
-
-    return copyFile(internalPath, outputPath);
-}
-
-async function copyThisDir(internalPath: string, outputDir: string): Promise<void> {
-    internalPath = jk_fs.resolve(gLocalDevDir!, internalPath);
-    console.log("Dev mode - Cloning dir: ", internalPath);
-
-    return copyDirectory(internalPath, outputDir);
 }
 
 function getLocalDevDir(): string|undefined {
