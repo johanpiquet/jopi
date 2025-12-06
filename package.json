@@ -38,7 +38,9 @@
     "tsc": "npx tsc",
     "bun-publish": "npx tsc && bun publish",
     "start": "node ./dist/index.js init --dir ./temp",
-    "clean": "rm -rf ./dist .turbo tsconfig.tsbuildinfo"
+    "clean": "rm -rf ./dist .turbo tsconfig.tsbuildinfo",
+    "test:init": "npx jopi init --template tutorial --dir ./temp"
+
   },
   "devDependencies": {
     "@types/bun": "latest",

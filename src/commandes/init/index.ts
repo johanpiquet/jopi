@@ -1,10 +1,10 @@
 import {term} from "../../common.ts";
 import {showMenu_SelectTemplate} from "./menu.ts";
-import {getProjectList, type ProjectItem} from "./github.ts";
+import {getProjectList, type ProjectItem} from "./projects.ts";
 import * as process from "node:process";
 import * as jk_fs from "jopi-toolkit/jk_fs";
-import {downloadDir, downloadFile} from "./gitpick.js";
 import {config} from "dotenv";
+import {downloadFile, downloadProject, forceGit} from "./downloader.ts";
 
 config();
 
@@ -18,12 +18,17 @@ export interface CommandOptions_Init {
     template: string;
     engine: "bun"|"node";
     dir: string;
+    forcegit: boolean;
 
     [key: string]: any;
 }
 
 export default async function(argv: CommandOptions_Init) {
     let selection: SelectedTemplate | undefined;
+
+    if (argv.forcegit) {
+        forceGit();
+    }
 
     //region Gets the template name and his options
 
@@ -126,5 +131,5 @@ async function executeProjectInstaller(project: ProjectItem, selection: Selected
 }
 
 async function installProjectSources(project: ProjectItem, installDir: string) {
-    await downloadDir(project.template + "/project", installDir);
+    await downloadProject(project.template + "/project.zip", installDir);
 }

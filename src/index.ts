@@ -24,6 +24,10 @@ yargs(hideBin(process.argv))
                 type: "string",
                 description: "The installation directory.",
                 default: process.cwd()
+            }).option("forcegit", {
+                type: "boolean",
+                description: "Force the use of git.",
+                default: false
             });
     }, (args: any) => commandInit(args as CommandOptions_Init))
     .demandCommand(1, 'You must specify a valid command.')
