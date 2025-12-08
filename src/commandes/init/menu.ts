@@ -1,6 +1,6 @@
 import {confirm, input, select} from '@inquirer/prompts';
 import type {SelectedTemplate} from "./index.js";
-import {getProjectList} from "./github.ts";
+import {getProjectList} from "./projects.ts";
 
 export async function showMenu_SelectTemplate(): Promise<undefined|SelectedTemplate> {
     let projects = await getProjectList();

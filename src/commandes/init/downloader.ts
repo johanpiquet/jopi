@@ -3,7 +3,7 @@ import process from "node:process";
 import {githubDownload} from "jopi-toolkit/jk_tools";
 import {createTempDir} from "jopi-toolkit/jk_fs";
 
-const GITHUB_URL = "https://github.com/johanpiquet/jopiProjectTemplates";
+const GITHUB_URL = "https://github.com/jopijs/jopiProjectTemplates";
 
 export async function downloadProject(internalPath: string, outputPath: string) {
     const tempDir = await createTempDir("jopiInit_")
