@@ -3,10 +3,7 @@ import {showMenu_SelectTemplate} from "./menu.ts";
 import {getProjectList, type ProjectItem} from "./projects.ts";
 import * as process from "node:process";
 import * as jk_fs from "jopi-toolkit/jk_fs";
-import {config} from "dotenv";
 import {downloadFile, downloadProject, forceGit} from "./downloader.ts";
-
-config();
 
 export type SelectedTemplate = {
     template: string;
@@ -27,6 +24,7 @@ export default async function(argv: CommandOptions_Init) {
     let selection: SelectedTemplate | undefined;
 
     if (argv.forcegit) {
+        console.log("> Forcing GIT usage");
         forceGit();
     }
 

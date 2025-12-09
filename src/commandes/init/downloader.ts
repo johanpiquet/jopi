@@ -61,6 +61,8 @@ function getLocalDevDir(): string|undefined {
     let v = process.env.JOPI_INIT_USE_DEV_DIR;
     if (!v) return undefined;
     if (v==="0") return undefined;
+
+    console.log("JOPI_INIT_USE_DEV_DIR - Using local dev directory:", v);
     return v;
 }
 

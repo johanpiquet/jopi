@@ -1,3 +1,5 @@
+import "./loadDotEnvFile.ts";
+
 import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 

@@ -1,6 +1,6 @@
 {
   "name": "jopi",
-  "version": "2.0.19",
+  "version": "2.0.20",
   "license": "MIT",
   "homepage": "https://github.com/johanpiquet/jopijs",
   "keywords": [
@@ -40,7 +40,8 @@
     "start": "node ./dist/index.js init --dir ./temp",
     "clean": "rm -rf ./dist .turbo tsconfig.tsbuildinfo",
     "test:tutorial": "npx jopi init --template tutorial --dir ../../temp",
-    "test:minimal": "npx jopi init --template minimal --dir ../../temp"
+    "test:minimal": "npx jopi init --template minimal --dir ../../temp",
+    "test:choice": "npx jopi init --dir ../../temp"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -48,10 +49,9 @@
   },
   "dependencies": {
     "@inquirer/prompts": "^7.9.0",
-    "dotenv": "^17.2.3",
     "jopi-toolkit": "workspace:^",
     "yargs": "^18.0.0"
   },
-  "publishedDate": "12/8/2025",
-  "publicPublishedDate": "12/8/2025"
+  "publishedDate": "12/9/2025",
+  "publicPublishedDate": "12/9/2025"
 }
