@@ -41,7 +41,8 @@
     "clean": "rm -rf ./dist .turbo tsconfig.tsbuildinfo",
     "test:tutorial": "npx jopi init --template tutorial --dir ../../temp",
     "test:minimal": "npx jopi init --template minimal --dir ../../temp",
-    "test:choice": "npx jopi init --dir ../../temp"
+    "test:choice": "npx jopi init --dir ../../temp",
+    "dev:tsc": "npx tsc --watch"
   },
   "devDependencies": {
     "@types/bun": "latest",
