@@ -3,9 +3,10 @@ import * as jk_fs from "jopi-toolkit/jk_fs";
 import * as jk_app from "jopi-toolkit/jk_app";
 import path from "node:path";
 import * as Process from 'node:process';
+import process from "node:process";
 
 if (isNodeJS) {
-    let rootDir = jk_app.findPackageJsonDir();
+    let rootDir = process.cwd();
     let envFile = path.join(rootDir, ".env");
 
     if (jk_fs.isFileSync(envFile)) {
