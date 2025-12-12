@@ -5,6 +5,7 @@ import {hideBin} from 'yargs/helpers';
 
 import commandInit, {type CommandOptions_Init} from "./commandes/init/index.ts";
 import commandUID from "./commandes/uid/index.ts";
+import commandShadCnAdd, {type CommandOptions_ShadCnAdd} from "./commandes/shadCn_add/index.ts";
 
 yargs(hideBin(process.argv))
     .command("uid", "Print a new UID", ()=> {} , ()=> {
@@ -31,6 +32,39 @@ yargs(hideBin(process.argv))
                 description: "Force the use of git.",
                 default: false
             });
-    }, (args: any) => commandInit(args as CommandOptions_Init))
+        },
+
+        (args: any) => commandInit(args as CommandOptions_Init)
+    )
+
+    .command("shadcn-add <components..>", "Install ShadCN components", (yargs) => {
+        return yargs
+            .positional('components', {
+                type: 'string',
+                array: true,
+                describe: 'The components to add.',
+                demandOption: true,
+            }).option('mod', {
+                type: 'string',
+                default: "shadCN",
+                description: "The module to install into.",
+            }).option("dir", {
+                type: "string",
+                description: "The installation directory.",
+                default: process.cwd()
+            }).option("registry", {
+                type: "string",
+                description: "The url of the registry to use."
+            }).option("yes", {
+                type: "boolean",
+                description: "Return yes to each question."
+            }).option("no", {
+                type: "boolean",
+                description: "Return no to each question."
+            });
+        },
+        (args: any) => commandShadCnAdd(args as CommandOptions_ShadCnAdd)
+    )
+
     .demandCommand(1, 'You must specify a valid command.')
     .version("2.0").help().parse();

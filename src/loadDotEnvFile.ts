@@ -1,6 +1,5 @@
 import {isNodeJS} from "jopi-toolkit/jk_what";
 import * as jk_fs from "jopi-toolkit/jk_fs";
-import * as jk_app from "jopi-toolkit/jk_app";
 import path from "node:path";
 import * as Process from 'node:process';
 import process from "node:process";
