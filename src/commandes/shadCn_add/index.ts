@@ -137,7 +137,7 @@ async function installComponent(args: CommandOptions_ShadCnAdd, component: strin
 }
 
 async function installFile(args: CommandOptions_ShadCnAdd, component: string, file: ShadCn_FileInfos) {
-    function pathAlias(content: string): string {
+    function patchAliasImports(content: string): string {
         let lines = content.split("\n");
 
         let isFirst = true;
@@ -201,7 +201,7 @@ async function installFile(args: CommandOptions_ShadCnAdd, component: string, fi
 
     console.log(`    ${jk_term.textRed(">")} Added file ${jk_term.textBlue(localPath)}`);
 
-    file.content = pathAlias(file.content);
+    fileContent = patchAliasImports(fileContent);
     await jk_fs.writeTextToFile(finalPath, fileContent);
 }
 
