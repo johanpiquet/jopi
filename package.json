@@ -44,7 +44,8 @@
     "test:init:tutorial": "npx jopi init --template tutorial --dir ../../temp",
     "test:init:list-choices": "npx jopi init --dir ../../temp",
 
-    "test:shadcn-add:test1": "npx jopi shadcn-add table chart --mod testShadInstaller --dir ../__jopi-ui-sample --yes"
+    "test:shadcn-add:test1": "npx jopi shadcn-add table chart --mod testShadInstaller --dir ../__jopi-ui-sample --yes",
+    "test:shadcn-add:dashboard-01": "npx jopi shadcn-add  dashboard-01 --mod testShadInstaller --dir ../__jopi-ui-sample --yes"
   },
   "devDependencies": {
     "@types/bun": "latest",
