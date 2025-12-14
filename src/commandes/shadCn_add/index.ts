@@ -85,18 +85,20 @@ interface PackageJson {
 
 interface FileInstallerParams {
     cliArgs: CommandOptions_ShadCnAdd,
-    itemName: string,
-    itemType: ShadCnType,
+    parentItemName: string,
+    parentType: ShadCnType,
     fileInfos: ShadCn_FileInfos
 }
 
 class FileInstaller {
-    constructor(private params: FileInstallerParams) {
+    constructor(protected params: FileInstallerParams) {
     }
 
     async install() {
         let filePath = this.patchFilePath(this.params.fileInfos.path);
-        this.params.fileInfos.content = "[jopi-done]";
+
+        // Convert to platform-agnostic (win32 or linux)
+        filePath = jk_fs.join(...filePath.split("/"));
 
         this.installLocalPath = jk_fs.join("src", this.params.cliArgs.mod, filePath);
         this.installFinalPath = jk_fs.join(this.params.cliArgs.dir, this.installLocalPath);
@@ -114,42 +116,11 @@ class FileInstaller {
     }
 
     protected patchFilePath(filePath: string): string {
-        return filePath;
+        return this.patchShadCnPath(filePath);
     }
 
     protected async onBeforeInstall(fileInfos: ShadCn_FileInfos) {
-        function patchAliasImports(content: string): string {
-            let lines = content.split("\n");
-
-            let isFirst = true;
-            content = "";
-
-            for (let line of lines) {
-                let trimmed = line.trim();
-
-                if (trimmed.startsWith("import ")) {
-                    trimmed = trimmed.replace("@/ui/", "@/shadLib/");
-                    trimmed = trimmed.replace("@/lib/", "@/shadLib/");
-                    trimmed = trimmed.replace("@/components/", "@/shadComponents/");
-                    trimmed = trimmed.replace("@/utils/", "@/shadUtils/");
-                    trimmed = trimmed.replace("@/hooks/", "@/shadHooks/");
-
-                    line = trimmed;
-                }
-
-                if (isFirst) {
-                    content += line;
-                    isFirst = false;
-                } else {
-                    content += "\n" + line;
-                }
-            }
-
-            return content;
-        }
-
-        let fileContent = fileInfos.content;
-        fileInfos.content = patchAliasImports(fileContent);
+        this.patchAliasImports(fileInfos);
     }
 
     // ***************
@@ -157,24 +128,109 @@ class FileInstaller {
     private installLocalPath: string = "";
     private installFinalPath: string = "";
 
-    protected convertPath(toReplace: string, replaceBy: string, filePath: string): string {
-        filePath = replaceBy + filePath.substring(toReplace.length);
-        let parts = filePath.split("/");
-        return jk_fs.join(...parts);
-    }
-
     protected patchShadCnPath(filePath: string): string {
-        if (filePath.startsWith("ui/")) return this.convertPath("ui/", "@alias/shadUI/", filePath);
-        if (filePath.startsWith("lib/")) return this.convertPath("lib/", "@alias/shadLib/", filePath);
-        if (filePath.startsWith("hooks/")) return this.convertPath("hooks/", "@alias/shadHooks/", filePath);
-        if (filePath.startsWith("utils/")) return this.convertPath("utils/", "@alias/shadUtils/", filePath);
-        if (filePath.startsWith("components/")) return this.convertPath("utils/", "@alias/shadComponents/", filePath);
+        function replace(toReplace: string, replaceBy: string, filePath: string): string {
+            return replaceBy + filePath.substring(toReplace.length);
+        }
+
+        if (this.params.parentType==="registry:block") {
+            let prefix = "blocks/" + this.params.parentItemName + "/";
+            if (filePath.startsWith(prefix)) {
+                filePath = filePath.substring(prefix.length);
+            }
+        }
+
+        if (filePath.startsWith("ui/")) return replace("ui/", "@alias/shadUI/", filePath);
+        if (filePath.startsWith("lib/")) return replace("lib/", "@alias/shadLib/", filePath);
+        if (filePath.startsWith("hooks/")) return replace("hooks/", "@alias/shadHooks/", filePath);
+        if (filePath.startsWith("utils/")) return replace("utils/", "@alias/shadUtils/", filePath);
+        if (filePath.startsWith("components/")) return replace("components/", "@alias/shadComponents/", filePath);
 
         return filePath;
     }
 
+    protected patchAliasImports(fileInfos: ShadCn_FileInfos) {
+        function doPatch(text: string): string {
+            const content = text;
+
+            let newContent: string[] = [];
+            let lines = content.split("\n");
+            let max = lines.length;
+
+            for (let i=0;i<max;i++) {
+                let line = lines[i];
+                let lineImport = line;
+
+                if (lineImport.trim().startsWith("import ")) {
+                    let lineFrom = line;
+                    let idxFrom = lineImport.indexOf("from");
+
+                    while (idxFrom===-1) {
+                        newContent.push(lineFrom);
+
+                        i++;
+                        if (i===max) return newContent.join("\n");
+
+                        lineFrom = lines[i];
+                        idxFrom = lineFrom.indexOf("from");
+                    }
+
+                    line = lineFrom;
+                    let idxFromTargetBegin = lineFrom.indexOf("@/", idxFrom);
+
+                    if (idxFromTargetBegin===-1) {
+                        newContent.push(lineFrom);
+                        continue;
+                    }
+
+                    let sep = line[idxFromTargetBegin-1];
+                    let idxFromTargetEnd = lineFrom.indexOf(sep, idxFromTargetBegin);
+
+                    let theImport = lineFrom.substring(idxFromTargetBegin, idxFromTargetEnd);
+                    let parts = theImport.split("/");
+
+                    if (parts.length >= 2) {
+                        let item = parts.pop();
+                        let group = parts.pop();
+
+                        switch (group) {
+                            case "ui":
+                                group = "shadUI";
+                                break;
+                            case "lib":
+                                group = "shadLib";
+                                break;
+                            case "components":
+                                group = "shadComponents";
+                                break;
+                            case "utils":
+                                group = "shadUtils";
+                                break;
+                            case "hooks":
+                                group = "shadHooks";
+                                break;
+                            default:
+                                newContent.push(line);
+                                continue;
+                        }
+
+                        theImport = "@/" + group + "/" + item;
+                        line = line.substring(0, idxFromTargetBegin) + theImport + line.substring(idxFromTargetEnd);
+                    }
+                }
+
+                newContent.push(line);
+            }
+
+            return newContent.join("\n");
+        }
+
+        let fileContent = fileInfos.content;
+        fileInfos.content = doPatch(fileContent);
+    }
+
     private printAddedMessage() {
-        console.log(`    ${jk_term.textRed(">")} Added file ${jk_term.textBlue(this.installLocalPath)}`);
+        console.log(`${jk_term.textRed(">")} Added file ${jk_term.textBlue(this.installLocalPath)}`);
     }
 
     private async confirmReplaceFile(): Promise<boolean> {
@@ -191,13 +247,18 @@ class FileInstaller {
     }
 }
 
-class FileInstaller_UI extends FileInstaller {
-    async onBeforeInstall(fileInfos: ShadCn_FileInfos) {
-        await super.onBeforeInstall(fileInfos);
-    }
-
+class FileInstaller_Page extends FileInstaller {
     protected patchFilePath(filePath: string): string {
-        return this.patchShadCnPath(filePath);
+        filePath = super.patchFilePath(filePath);
+        return "@routes/shadPages/" + this.params.parentItemName + "/" + filePath;
+    }
+}
+
+class FileInstaller_PageFile extends FileInstaller {
+    protected patchFilePath(filePath: string): string {
+        let basePath = "@routes/shadPages/" + this.params.parentItemName;
+        filePath = super.patchFilePath(filePath);
+        return basePath + "/" + filePath;
     }
 }
 
@@ -222,14 +283,9 @@ class ItemInstaller {
             return;
         }
 
-        this.printStarting();
         this.queueShadCnDependencies();
         await this.installPackageJsonDependencies();
         await this.installAllFiles();
-    }
-
-    protected printStarting() {
-        console.log(`>>> Component ${jk_term.textBlue(this.params.itemName)} - ${jk_term.textGrey(this.params.itemType)}`)
     }
 
     protected acceptItem(item: ShadCn_ComponentJson) {
@@ -237,6 +293,10 @@ class ItemInstaller {
             case "registry:ui":
                 return true;
             case "registry:component":
+                return true;
+            case "registry:block":
+            case "registry:hook":
+            case "registry:lib":
                 return true;
             default:
                 return false;
@@ -256,55 +316,49 @@ class ItemInstaller {
     }
 
     protected async installPackageJsonDependencies() {
+        function appendAll() {
+            for (let dep of list) {
+                let dep2 = dep;
+                if (dep[0]==="@") dep2 = dep.substring(1);
+
+                let version = "latest";
+                let name = dep;
+
+                let idx = dep2.indexOf("@");
+
+                if (idx!==-1) {
+                    name = dep2.substring(0, idx);
+                    version = dep2.substring(idx+1);
+
+                    if (version!=="latest") {
+                        let first = version[0];
+                        if ((first!=="^") && (first!==">") && (first !== "~")) version = "^" + version;
+                    }
+                }
+
+                let currentVersion = map[name];
+
+                if (currentVersion) {
+                    if (version==="latest") {
+                        continue;
+                    }
+                }
+
+                map[name] = version;
+            }
+        }
+
         const item = this.params.item;
         if (!item.dependencies && !item.devDependencies) return;
 
-        let pkgJsonFilePath = jk_app.findPackageJson(this.params.cliArgs.dir);
-        if (!pkgJsonFilePath) stopError("No 'package.json' file found in " + this.params.cliArgs.dir);
+        let map = gDependenciesToAdd;
+        let list = item.dependencies;
+        if (list) appendAll();
 
-        let json = await jk_fs.readJsonFromFile<PackageJson>(pkgJsonFilePath);
-        if (!json) stopError("Can't read 'package.json' file at" + pkgJsonFilePath);
-
-        let mustSave = false;
-
-        if (item.dependencies) {
-            if (!json.dependencies) json.dependencies = {};
-
-            for (let dep of item.dependencies) {
-                let idx = dep.indexOf("@");
-                if (idx===-1) continue;
-
-                let depName = dep.substring(0, idx);
-                let depVersion = "^" + dep.substring(idx+1);
-
-                if (!json.dependencies[depName]) {
-                    mustSave = true;
-                    gHasDependenciesAdded = true;
-                    json.dependencies[depName] = depVersion;
-                    console.log(`    ${jk_term.textRed(">")} Added dependency ${dep}`);
-                }
-            }
-        }
-
-        if (item.devDependencies) {
-            for (let dep of item.devDependencies) {
-                let idx = dep.indexOf("@");
-                if (idx===-1) continue;
-
-                let depName = dep.substring(0, idx);
-                let depVersion = dep.substring(idx+1);
-
-                if (!json.devDependencies[depName]) {
-                    mustSave = true;
-                    gHasDependenciesAdded = true;
-                    json.devDependencies[depName] = depVersion;
-                    console.log(`    ${jk_term.textRed(">")} Added dev-dependency ${dep}`);
-                }
-            }
-        }
-
-        if (mustSave) {
-            await jk_fs.writeTextToFile(pkgJsonFilePath, JSON.stringify(json, null, 4));
+        map = gDevDependenciesToAdd;
+        list = item.devDependencies;
+        if (list) {
+            appendAll();
         }
     }
 
@@ -317,27 +371,34 @@ class ItemInstaller {
     }
 
     protected async installThisFile(fileInfos: ShadCn_FileInfos) {
-        const params = {
+        const fileParams: FileInstallerParams = {
+            fileInfos,
             cliArgs: this.params.cliArgs,
-            itemName: this.params.itemName,
-            itemType: this.params.item.type,
-            fileInfos
+            parentItemName: this.params.itemName,
+            parentType: this.params.item.type
         };
 
-        switch (params.fileInfos.type) {
+        switch (fileParams.fileInfos.type) {
             case "registry:ui":
-                return (new FileInstaller_UI(params)).install();
             case "registry:component":
-                return (new FileInstaller_UI(params)).install();
-            case "registry:block":
-                console.log("Block ...")
-                return;
+            case "registry:hook":
+            case "registry:lib":
+                return (new FileInstaller(fileParams)).install();
+
             case "registry:page":
-                return (new FileInstaller(params)).install();
+                return (new FileInstaller_Page(fileParams)).install();
+
+            case "registry:file":
+                if (fileParams.parentType!=="registry:block") {
+                    console.log("Ignoring invalid file", fileParams.fileInfos.path);
+                    return undefined;
+                }
+
+                return (new FileInstaller_PageFile(fileParams)).install();
+
             default:
-                console.log("Ignored type", params.fileInfos.type)
-                //return (new FileInstaller(params)).install();
-                return;
+                console.log("Ignored file type", fileParams.parentType, fileParams.fileInfos)
+                return undefined;
         }
     }
 }
@@ -349,27 +410,29 @@ function stopError(msg: string) {
     process.exit(1);
 }
 
-export default async function(args: CommandOptions_ShadCnAdd) {
-    args.dir = jk_fs.resolve(args.dir);
-    if (!args.mod.startsWith("mod_")) args.mod = "mod_" + args.mod;
+export default async function(cliArgs: CommandOptions_ShadCnAdd) {
+    cliArgs.dir = jk_fs.resolve(cliArgs.dir);
+    if (!cliArgs.mod.startsWith("mod_")) cliArgs.mod = "mod_" + cliArgs.mod;
 
-    let componentsJson = await jk_fs.readJsonFromFile(args.dir + "/components.json");
-    if (!componentsJson) stopError("No 'components.json' file found in " + args.dir);
+    let componentsJson = await jk_fs.readJsonFromFile(cliArgs.dir + "/components.json");
+    if (!componentsJson) stopError("No 'components.json' file found in " + cliArgs.dir);
 
     // "new-york" or "default"
     let baseStyleName = componentsJson.style;
     
     while (true) {
-        let component = args.components.pop();
+        let component = cliArgs.components.pop();
         if (!component) break;
 
-        await installItem(args, component, baseStyleName);
+        await installItem(cliArgs, component, baseStyleName);
     }
+
+    await addDependenciesToPackageJson(cliArgs);
 
     console.log(`\n${jk_term.textGreen("✔")} Installed`);
 
     if (gHasDependenciesAdded) {
-        console.log(`${jk_term.textRed("Warning - Dependencies has been added")} - You must run ${jk_term.textBlue("npm install")} to install them.`);
+        console.log(`${jk_term.textRed("\n!!!!!! Warning - Dependencies has been added !!!!!!")}\nYou must run ${jk_term.textBlue("npm install")} to install them.`);
     }
 }
 
@@ -392,5 +455,49 @@ async function installItem(cliArgs: CommandOptions_ShadCnAdd, itemName: string, 
     //console.log(json);
 }
 
+async function addDependenciesToPackageJson(cliArgs: CommandOptions_ShadCnAdd) {
+    function appendAll(depMap: Record<string, string>, targetMap: Record<string, string>) {
+        for (let depName in depMap) {
+            let depVersion = depMap[depName];
+
+            if (!targetMap[depName]) {
+                mustSave = true;
+                gHasDependenciesAdded = true;
+                targetMap[depName] = depVersion;
+                console.log(`    ${jk_term.textRed(">")} Added dependency ${depName}`);
+            }
+        }
+    }
+
+    if (
+        !Object.values(gDependenciesToAdd).length &&
+        !Object.values(gDevDependenciesToAdd).length
+    ) return;
+
+    let pkgJsonFilePath = jk_app.findPackageJson(cliArgs.dir);
+    if (!pkgJsonFilePath) stopError("No 'package.json' file found in " + cliArgs.dir);
+
+    let json = await jk_fs.readJsonFromFile<PackageJson>(pkgJsonFilePath);
+    if (!json) stopError("Can't read 'package.json' file at" + pkgJsonFilePath);
+
+    let mustSave = false;
+
+    if (gDependenciesToAdd) {
+        if (!json.dependencies) json.dependencies = {};
+        appendAll(gDependenciesToAdd, json.dependencies);
+    }
+
+    if (gDevDependenciesToAdd) {
+        if (!json.dependencies) json.devDependencies = {};
+        appendAll(gDevDependenciesToAdd, json.devDependencies);
+    }
+
+    if (mustSave) {
+        await jk_fs.writeTextToFile(pkgJsonFilePath, JSON.stringify(json, null, 4));
+    }
+}
+
 let gHasDependenciesAdded = false;
+let gDependenciesToAdd: Record<string, string> = {};
+let gDevDependenciesToAdd: Record<string, string> = {};
 
