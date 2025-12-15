@@ -85,6 +85,7 @@ interface PackageJson {
 //region File Installers
 
 interface FileInstallerParams {
+    installBaseDir: string;
     cliArgs: CommandOptions_ShadCnAdd,
     parentItemName: string,
     parentType: ShadCnType,
@@ -116,10 +117,6 @@ class FileInstaller {
         this.params.fileInfos.content = "[jopi-done]";
     }
 
-    protected patchFilePath(filePath: string): string {
-        return this.patchShadCnPath(filePath);
-    }
-
     protected async onBeforeInstall(fileInfos: ShadCn_FileInfos) {
         this.patchAliasImports(fileInfos);
     }
@@ -128,6 +125,17 @@ class FileInstaller {
 
     private installLocalPath: string = "";
     private installFinalPath: string = "";
+
+    /**
+     * Define how items are imported.
+     * - true: use @alias/shadUI and import "@/shadUI/myComp".
+     * - false: use "mod_myMod/shadCN/ui" and import "../ui/myComp".
+     */
+    protected readonly useAliasMod = false;
+
+    protected patchFilePath(filePath: string): string {
+        return this.patchShadCnPath(filePath);
+    }
 
     protected patchShadCnPath(filePath: string): string {
         function replace(toReplace: string, replaceBy: string, filePath: string): string {
@@ -141,17 +149,29 @@ class FileInstaller {
             }
         }
 
-        if (filePath.startsWith("ui/")) return replace("ui/", "@alias/shadUI/", filePath);
-        if (filePath.startsWith("lib/")) return replace("lib/", "@alias/shadLib/", filePath);
-        if (filePath.startsWith("hooks/")) return replace("hooks/", "@alias/shadHooks/", filePath);
-        if (filePath.startsWith("utils/")) return replace("utils/", "@alias/shadUtils/", filePath);
-        if (filePath.startsWith("components/")) return replace("components/", "@alias/shadComponents/", filePath);
+        if (this.useAliasMod) {
+            if (filePath.startsWith("ui/")) return replace("ui/", "@alias/shadUI/", filePath);
+            if (filePath.startsWith("lib/")) return replace("lib/", "@alias/shadLib/", filePath);
+            if (filePath.startsWith("hooks/")) return replace("hooks/", "@alias/shadHooks/", filePath);
+            if (filePath.startsWith("utils/")) return replace("utils/", "@alias/shadUtils/", filePath);
+            if (filePath.startsWith("components/")) return replace("components/", "@alias/shadComponents/", filePath);
+        } else {
+            if (filePath.startsWith("ui/")) return replace("ui/", "shadCN/ui/", filePath);
+            if (filePath.startsWith("lib/")) return replace("lib/", "shadCN/lib/", filePath);
+            if (filePath.startsWith("hooks/")) return replace("hooks/", "shadCN/hooks/", filePath);
+            if (filePath.startsWith("utils/")) return replace("utils/", "shadCN/utils/", filePath);
+            if (filePath.startsWith("components/")) return replace("components/", "shadCN/components/", filePath);
+        }
 
         return filePath;
     }
 
+    protected getRelatifShadCnDirPath() {
+        return "..";
+    }
+
     protected patchAliasImports(fileInfos: ShadCn_FileInfos) {
-        function doPatch(text: string): string {
+        const doPatch = (text: string): string => {
             const content = text;
 
             let newContent: string[] = [];
@@ -194,28 +214,34 @@ class FileInstaller {
                         let item = parts.pop();
                         let group = parts.pop();
 
-                        switch (group) {
-                            case "ui":
-                                group = "shadUI";
-                                break;
-                            case "lib":
-                                group = "shadLib";
-                                break;
-                            case "components":
-                                group = "shadComponents";
-                                break;
-                            case "utils":
-                                group = "shadUtils";
-                                break;
-                            case "hooks":
-                                group = "shadHooks";
-                                break;
-                            default:
-                                newContent.push(line);
-                                continue;
+                        if (this.useAliasMod) {
+                            switch (group) {
+                                case "ui":
+                                    group = "shadUI";
+                                    break;
+                                case "lib":
+                                    group = "shadLib";
+                                    break;
+                                case "components":
+                                    group = "shadComponents";
+                                    break;
+                                case "utils":
+                                    group = "shadUtils";
+                                    break;
+                                case "hooks":
+                                    group = "shadHooks";
+                                    break;
+                                default:
+                                    newContent.push(line);
+                                    continue;
+                            }
+
+                            theImport = "@/" + group + "/" + item;
+                        }
+                        else {
+                            theImport = this.getRelatifShadCnDirPath() + "/" + group + "/" + item;
                         }
 
-                        theImport = "@/" + group + "/" + item;
                         line = line.substring(0, idxFromTargetBegin) + theImport + line.substring(idxFromTargetEnd);
                     }
                 }
@@ -250,8 +276,13 @@ class FileInstaller {
 
 class FileInstaller_Page extends FileInstaller {
     protected patchFilePath(filePath: string): string {
+        const fileDir = "@routes/shadPages/" + this.params.parentItemName + "/";
         filePath = super.patchFilePath(filePath);
-        return "@routes/shadPages/" + this.params.parentItemName + "/" + filePath;
+        return fileDir + filePath;
+    }
+
+    protected getRelatifShadCnDirPath() {
+        return "../../../shadCN";
     }
 }
 
@@ -275,7 +306,10 @@ interface ItemInstallerParams {
 }
 
 class ItemInstaller {
+    private readonly installBaseDir: string;
+
     constructor(private params: ItemInstallerParams) {
+        this.installBaseDir = params.cliArgs.dir + '/src/' + params.cliArgs.mod;
     }
 
     async install() {
@@ -373,7 +407,7 @@ class ItemInstaller {
 
     protected async installThisFile(fileInfos: ShadCn_FileInfos) {
         const fileParams: FileInstallerParams = {
-            fileInfos,
+            fileInfos, installBaseDir: this.installBaseDir,
             cliArgs: this.params.cliArgs,
             parentItemName: this.params.itemName,
             parentType: this.params.item.type
