@@ -77,6 +77,7 @@ interface ShadCn_ComponentJson {
 interface PackageJson {
     dependencies?: Record<string, string>;
     devDependencies?: Record<string, string>;
+    workspaces?: string[];
 }
 
 //endregion
@@ -1071,7 +1072,7 @@ export default async function(cliArgs: CommandOptions_ShadCnAdd) {
     console.log(`\n${jk_term.textGreen("✔")} Installed`);
 
     if (gHasDependenciesAdded) {
-        console.log(`${jk_term.textRed("\n!!!!!! Warning - Dependencies has been added !!!!!!")}\nYou must run ${jk_term.textBlue("npm install")} to install them.`);
+        console.log(`${jk_term.textBgRed("\n!!!!!! Warning - Dependencies has been added !!!!!!")}\n!!!!!! You must run ${jk_term.textBlue("npm install")} to install them.`);
     }
 }
 
@@ -1095,24 +1096,15 @@ async function installItem(cliArgs: CommandOptions_ShadCnAdd, itemName: string, 
 }
 
 async function addDependenciesToPackageJson(cliArgs: CommandOptions_ShadCnAdd) {
-    function appendAll(depMap: Record<string, string>, pkgJson: Record<string, string>, modJson: Record<string, string>) {
-        for (let depName in depMap) {
-            let depVersion = depMap[depName];
-
-            if (!pkgJson[depName]) {
-                mustSavePkgJson = true;
-                gHasDependenciesAdded = true;
-                pkgJson[depName] = depVersion;
-                console.log(`    ${jk_term.textRed(">")} Added dependency ${depName}`);
-            }
-        }
-
+    function appendAll(depMap: Record<string, string>, modJson: Record<string, string>) {
         for (let depName in depMap) {
             let depVersion = depMap[depName];
 
             if (!modJson[depName]) {
                 mustSaveModJson = true;
+                gHasDependenciesAdded = true;
                 modJson[depName] = depVersion;
+                console.log(`    ${jk_term.textRed(">")} Added dependency ${depName}`);
             }
         }
     }
@@ -1128,32 +1120,40 @@ async function addDependenciesToPackageJson(cliArgs: CommandOptions_ShadCnAdd) {
     let packageJson = await jk_fs.readJsonFromFile<PackageJson>(pkgJsonFilePath);
     if (!packageJson) stopError("Can't read 'package.json' file at" + pkgJsonFilePath);
 
-    let mustSavePkgJson = false;
+    if (!packageJson.workspaces) packageJson.workspaces = [];
+
+    if (!packageJson.workspaces.includes("src/" + cliArgs.mod)) {
+        packageJson.workspaces.push("src/" + cliArgs.mod);
+        gHasDependenciesAdded = true;
+        await jk_fs.writeTextToFile(pkgJsonFilePath, JSON.stringify(packageJson, null, 4));
+    }
+
+
     let mustSaveModJson = false;
 
     let modDir = jk_fs.join(cliArgs.dir, "src", cliArgs.mod);
-    let moduleJsonFilePath = jk_fs.join(modDir, "module.json");
+    let moduleJsonFilePath = jk_fs.join(modDir, "package.json");
     let moduleJson = await jk_fs.readJsonFromFile<PackageJson>(moduleJsonFilePath);
 
     if (!moduleJson) {
         mustSaveModJson = true;
-        moduleJson = {};
+
+        moduleJson = {
+            dependencies: {},
+            devDependencies: {}
+        };
     }
 
     if (gDependenciesToAdd) {
         if (!packageJson.dependencies) packageJson.dependencies = {};
         if (!moduleJson.dependencies) moduleJson.dependencies = {};
-        appendAll(gDependenciesToAdd, packageJson.dependencies, moduleJson.dependencies);
+        appendAll(gDependenciesToAdd, moduleJson.dependencies);
     }
 
     if (gDevDependenciesToAdd) {
         if (!packageJson.devDependencies) packageJson.devDependencies = {};
         if (!moduleJson.devDependencies) moduleJson.devDependencies = {};
-        appendAll(gDevDependenciesToAdd, packageJson.devDependencies, moduleJson.devDependencies);
-    }
-
-    if (mustSavePkgJson) {
-        await jk_fs.writeTextToFile(pkgJsonFilePath, JSON.stringify(packageJson, null, 4));
+        appendAll(gDevDependenciesToAdd, moduleJson.devDependencies);
     }
 
     if (mustSaveModJson) {
