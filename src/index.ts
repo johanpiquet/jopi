@@ -6,6 +6,7 @@ import {hideBin} from 'yargs/helpers';
 import commandInit, {type CommandOptions_Init} from "./commandes/init/index.ts";
 import commandUID from "./commandes/uid/index.ts";
 import commandShadCnAdd, {type CommandOptions_ShadCnAdd} from "./commandes/shadCn_add/index.ts";
+import {commandModInstall, type CommandOptions_ModInstall} from "./commandes/mod_install/index.ts";
 
 yargs(hideBin(process.argv))
     .command("uid", "Print a new UID", ()=> {} , ()=> {
@@ -64,6 +65,22 @@ yargs(hideBin(process.argv))
             });
         },
         (args: any) => commandShadCnAdd(args as CommandOptions_ShadCnAdd)
+    )
+
+    .command("mod-install [modules..]", "Install modules into the src/ dir", (yargs) => {
+            return yargs
+                .positional('modules', {
+                    type: 'string',
+                    array: true,
+                    describe: 'The modules to install.',
+                    demandOption: true,
+                }).option("dir", {
+                    type: "string",
+                    description: "The installation directory.",
+                    default: process.cwd()
+                });
+        },
+        (args: any) => commandModInstall(args as CommandOptions_ModInstall)
     )
 
     .demandCommand(1, 'You must specify a valid command.')
