@@ -105,7 +105,7 @@ class ModInstaller {
                 foundModules[modName] = true;
             }
 
-            newWsItems.push("./src/" + modName);
+            newWsItems.push("src/" + modName);
         }
 
         for (let modName of allModNames) {
@@ -116,7 +116,7 @@ class ModInstaller {
             hasAddedWkItems = true;
 
             foundModules[modName] = true;
-            newWsItems.push("./src/" + modName);
+            newWsItems.push("src/" + modName);
         }
 
         //endregion
