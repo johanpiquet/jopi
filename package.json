@@ -1,6 +1,6 @@
 {
   "name": "jopi",
-  "version": "2.0.23",
+  "version": "2.0.24",
   "license": "MIT",
   "homepage": "https://github.com/johanpiquet/jopijs",
   "keywords": [
@@ -37,6 +37,7 @@
     "dev:tsc": "npx tsc --watch",
     "build": "npx tsc",
     "tsc": "npx tsc",
+    "jopiLink": "npx jopi-mono link-add",
     "bun-publish": "npx tsc && bun publish",
     "start": "node ./dist/index.js init --dir ./temp",
     "clean": "rm -rf ./dist .turbo tsconfig.tsbuildinfo",
@@ -56,6 +57,6 @@
     "jopi-toolkit": "workspace:^",
     "yargs": "^18.0.0"
   },
-  "publishedDate": "12/11/2025",
+  "publishedDate": "12/16/2025",
   "publicPublishedDate": "12/11/2025"
 }
