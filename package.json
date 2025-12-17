@@ -1,6 +1,6 @@
 {
   "name": "jopi",
-  "version": "2.0.24",
+  "version": "2.0.25",
   "license": "MIT",
   "homepage": "https://github.com/johanpiquet/jopijs",
   "keywords": [
@@ -57,6 +57,6 @@
     "jopi-toolkit": "workspace:^",
     "yargs": "^18.0.0"
   },
-  "publishedDate": "12/16/2025",
+  "publishedDate": "12/17/2025",
   "publicPublishedDate": "12/11/2025"
 }
