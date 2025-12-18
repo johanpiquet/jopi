@@ -105,12 +105,13 @@ class FileInstaller {
         this.installLocalPath = jk_fs.join("src", this.params.cliArgs.mod, filePath);
         this.installFinalPath = jk_fs.join(this.params.cliArgs.dir, this.installLocalPath);
 
-        if (!await this.confirmReplaceFile()) {
+        await this.onBeforeInstall(this.params.fileInfos)
+
+        if (!await this.confirmReplaceFile(this.params.fileInfos.content)) {
             this.params.fileInfos.content = "[jopi-done]";
             return;
         }
 
-        await this.onBeforeInstall(this.params.fileInfos)
         await jk_fs.writeTextToFile(this.installFinalPath, this.params.fileInfos.content);
         this.printAddedMessage();
 
@@ -260,8 +261,15 @@ class FileInstaller {
         console.log(`${jk_term.textRed(">")} Added file ${jk_term.textBlue(this.installLocalPath)}`);
     }
 
-    private async confirmReplaceFile(): Promise<boolean> {
+    private async confirmReplaceFile(expectedContent: string): Promise<boolean> {
         if (await jk_fs.isFile(this.installFinalPath)) {
+            let currentContent = await jk_fs.readTextFromFile(this.installFinalPath);
+
+            // Content is identical? Nothing to do.
+            if (currentContent.trim()===expectedContent.trim()) {
+                return false;
+            }
+
             if (this.params.cliArgs.no===true) return false;
 
             if (this.params.cliArgs.yes!==true) {
@@ -403,6 +411,20 @@ class ItemInstaller {
                 await this.installThisFile(fileInfos);
             }
         }
+
+        await this.installThisFile({
+            type: "registry:lib",
+            path: "lib/utils.ts",
+            target: "",
+
+            content: `import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs))
+}
+`
+        });
     }
 
     protected async installThisFile(fileInfos: ShadCn_FileInfos) {
@@ -1244,6 +1266,7 @@ async function initComponentsJsonFile(baseDir: string) {
     );
 
     let globalCssFile = jk_fs.join(baseDir, "global.css");
+
     if (!await jk_fs.isFile(globalCssFile)) {
         let themeContent = gThemes[selectedColor].trim();
         await jk_fs.writeTextToFile(globalCssFile, themeContent);
