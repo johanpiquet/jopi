@@ -1189,8 +1189,19 @@ async function addDependenciesToPackageJson(cliArgs: CommandOptions_ShadCnAdd) {
         };
     }
 
+    if (!moduleJson.dependencies) moduleJson.dependencies = {};
+
+    if (moduleJson.dependencies["react"]!=="*") {
+        moduleJson.dependencies["react"] = "*";
+        mustSaveModJson = true;
+    }
+
+    if (moduleJson.dependencies["react-dom"]!=="*") {
+        moduleJson.dependencies["react-dom"] = "*";
+        mustSaveModJson = true;
+    }
+
     if (gDependenciesToAdd) {
-        if (!moduleJson.dependencies) moduleJson.dependencies = {};
         appendAll(gDependenciesToAdd, moduleJson.dependencies);
     }
 
