@@ -1,6 +1,7 @@
 import * as jk_fs from "jopi-toolkit/jk_fs";
 import * as jk_term from "jopi-toolkit/jk_term";
 import * as jk_app from "jopi-toolkit/jk_app";
+import {updateWorkspaces} from "jopijs/modules";
 import process from "node:process";
 
 export interface CommandOptions_ModInstall {
@@ -45,90 +46,7 @@ class ModInstaller {
 
 
         await this.installAllModules();
-        await this.updateWorkspaces();
-    }
-
-    private async updateWorkspaces() {
-        //region Get all existing modules
-
-        let dirItems = await jk_fs.listDir(jk_fs.join(this.rootDir, "src"));
-        let allModNames: string[] = [];
-
-        dirItems.forEach(dir => {
-            if (!dir.isDirectory) return;
-            if (dir.name.startsWith("mod_")) {
-                allModNames.push(dir.name);
-            }
-        });
-
-        //endregion
-
-        //region Get workspace items
-
-        let wsItems: string[];
-
-        if (!this.pkgJson.workspaces) {
-            this.pkgJson.workspaces = [];
-            wsItems = [];
-        } else {
-            wsItems = this.pkgJson.workspaces;
-        }
-
-        //endregion
-
-        //region Add modules into the workspace
-
-        let newWsItems: string[] = [];
-        let foundModules: Record<string, boolean> = {};
-        let needSavePkgJson = false;
-        let hasAddedWkItems = false;
-
-        for (let item of wsItems) {
-            let modName: string;
-            let idx = item.lastIndexOf("/");
-            if (idx===-1) modName = item;
-            else modName = item.substring(idx+1);
-
-            if (modName.startsWith("mod_")) {
-                if (!allModNames.includes(modName)) {
-                    // Is a module but doesn't exist anymore?
-                    needSavePkgJson = true;
-                    continue;
-                }
-
-                // Avoid double.
-                if (foundModules[modName]) {
-                    needSavePkgJson = true;
-                    continue;
-                }
-
-                foundModules[modName] = true;
-            }
-
-            newWsItems.push("src/" + modName);
-        }
-
-        for (let modName of allModNames) {
-            // Already found into the workspace?
-            if (foundModules[modName]) continue;
-
-            needSavePkgJson = true;
-            hasAddedWkItems = true;
-
-            foundModules[modName] = true;
-            newWsItems.push("src/" + modName);
-        }
-
-        //endregion
-
-        if (needSavePkgJson) {
-            this.pkgJson.workspaces = newWsItems;
-            await jk_fs.writeTextToFile(jk_fs.join(this.rootDir, "package.json"), JSON.stringify(this.pkgJson, null, 4));
-
-            if (hasAddedWkItems) {
-                console.log(`${jk_term.textBgRed("\n!!!!!! Warning - Dependencies has been added !!!!!!")}\n!!!!!! You must run ${jk_term.textBlue("npm install")} to install them.`);
-            }
-        }
+        await updateWorkspaces();
     }
 
     private addModulesToInstall(modList: string[]) {

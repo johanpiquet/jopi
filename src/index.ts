@@ -7,6 +7,7 @@ import commandInit, {type CommandOptions_Init} from "./commandes/init/index.ts";
 import commandUID from "./commandes/uid/index.ts";
 import commandShadCnAdd, {type CommandOptions_ShadCnAdd} from "./commandes/shadCn_add/index.ts";
 import {commandModInstall, type CommandOptions_ModInstall} from "./commandes/mod_install/index.ts";
+import {commandModCheck, type CommandOptions_ModCheck} from "./commandes/mod_check/index.js";
 
 yargs(hideBin(process.argv))
     .command("uid", "Print a new UID", ()=> {} , ()=> {
@@ -65,6 +66,17 @@ yargs(hideBin(process.argv))
             });
         },
         (args: any) => commandShadCnAdd(args as CommandOptions_ShadCnAdd)
+    )
+
+    .command("mod-check", "Check the modules", (yargs) => {
+            return yargs
+                .option("dir", {
+                    type: "string",
+                    description: "The installation directory.",
+                    default: process.cwd()
+                });
+        },
+        (args: any) => commandModCheck(args as CommandOptions_ModCheck)
     )
 
     .command("mod-install [modules..]", "Install modules into the src/ dir", (yargs) => {

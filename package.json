@@ -54,7 +54,7 @@
   },
   "dependencies": {
     "@inquirer/prompts": "^7.9.0",
-    "jopi-toolkit": "workspace:^",
+    "jopijs": "workspace:^",
     "yargs": "^18.0.0"
   },
   "publishedDate": "12/17/2025",

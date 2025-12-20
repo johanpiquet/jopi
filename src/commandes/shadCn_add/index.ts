@@ -1,6 +1,6 @@
 import * as jk_fs from "jopi-toolkit/jk_fs";
 import * as jk_term from "jopi-toolkit/jk_term";
-import * as jk_app from "jopi-toolkit/jk_app";
+import {onProjectDependenciesAdded, updateWorkspaces} from "jopijs/modules";
 
 import process from "node:process";
 import {confirm, select} from '@inquirer/prompts';
@@ -1127,8 +1127,10 @@ export default async function(cliArgs: CommandOptions_ShadCnAdd) {
 
     console.log(`\n${jk_term.textGreen("✔")} Installed`);
 
+    await updateWorkspaces();
+
     if (gHasDependenciesAdded) {
-        console.log(`${jk_term.textBgRed("\n!!!!!! Warning - Dependencies has been added !!!!!!")}\n!!!!!! You must run ${jk_term.textBlue("npm install")} to install them.`);
+        onProjectDependenciesAdded();
     }
 }
 
@@ -1170,21 +1172,6 @@ async function addDependenciesToPackageJson(cliArgs: CommandOptions_ShadCnAdd) {
         !Object.values(gDevDependenciesToAdd).length
     ) return;
 
-    let pkgJsonFilePath = jk_app.findPackageJson(cliArgs.dir);
-    if (!pkgJsonFilePath) stopError("No 'package.json' file found in " + cliArgs.dir);
-
-    let packageJson = await jk_fs.readJsonFromFile<PackageJson>(pkgJsonFilePath);
-    if (!packageJson) stopError("Can't read 'package.json' file at" + pkgJsonFilePath);
-
-    if (!packageJson.workspaces) packageJson.workspaces = [];
-
-    if (!packageJson.workspaces.includes("src/" + cliArgs.mod)) {
-        packageJson.workspaces.push("src/" + cliArgs.mod);
-        gHasDependenciesAdded = true;
-        await jk_fs.writeTextToFile(pkgJsonFilePath, JSON.stringify(packageJson, null, 4));
-    }
-
-
     let mustSaveModJson = false;
 
     let modDir = jk_fs.join(cliArgs.dir, "src", cliArgs.mod);
@@ -1201,13 +1188,11 @@ async function addDependenciesToPackageJson(cliArgs: CommandOptions_ShadCnAdd) {
     }
 
     if (gDependenciesToAdd) {
-        if (!packageJson.dependencies) packageJson.dependencies = {};
         if (!moduleJson.dependencies) moduleJson.dependencies = {};
         appendAll(gDependenciesToAdd, moduleJson.dependencies);
     }
 
     if (gDevDependenciesToAdd) {
-        if (!packageJson.devDependencies) packageJson.devDependencies = {};
         if (!moduleJson.devDependencies) moduleJson.devDependencies = {};
         appendAll(gDevDependenciesToAdd, moduleJson.devDependencies);
     }
