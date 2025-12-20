@@ -1,6 +1,6 @@
 import * as jk_fs from "jopi-toolkit/jk_fs";
 import * as jk_term from "jopi-toolkit/jk_term";
-import {onProjectDependenciesAdded, updateWorkspaces} from "jopijs/modules";
+import {onProjectDependenciesAdded, setProjectRootDir, updateWorkspaces} from "jopijs/modules";
 
 import process from "node:process";
 import {confirm, select} from '@inquirer/prompts';
@@ -1103,7 +1103,9 @@ function stopError(msg: string) {
 }
 
 export default async function(cliArgs: CommandOptions_ShadCnAdd) {
-    cliArgs.dir = jk_fs.resolve(cliArgs.dir);
+    cliArgs.dir = jk_fs.resolve(cliArgs.dir) || process.cwd();
+    setProjectRootDir(cliArgs.dir);
+
     if (!cliArgs.mod.startsWith("mod_")) cliArgs.mod = "mod_" + cliArgs.mod;
 
     let componentsJson = await jk_fs.readJsonFromFile(cliArgs.dir + "/components.json");

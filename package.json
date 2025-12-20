@@ -46,7 +46,8 @@
     "test:shadcn-add:test1": "npx jopi shadcn-add table chart --mod testShadInstaller --dir ../__jopi-ui-sample --yes",
     "test:shadcn-add:dashboard-01": "npx jopi shadcn-add  dashboard-01 --mod testShadInstaller --dir ../__jopi-ui-sample --yes",
     "test:mod-install": "npx jopi mod-install --dir ../__jopi-ui-sample",
-    "test:mod-installThis": "npx jopi mod-install mod1 --dir ../__jopi-ui-sample"
+    "test:mod-installThis": "npx jopi mod-install mod1 --dir ../__jopi-ui-sample",
+    "test:mod-add": "npx jopi mod-new mod_toto --dir ../__jopi-ui-sample"
   },
   "devDependencies": {
     "@types/bun": "latest",
