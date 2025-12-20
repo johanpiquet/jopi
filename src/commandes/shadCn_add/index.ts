@@ -1102,7 +1102,7 @@ function stopError(msg: string) {
     process.exit(1);
 }
 
-export default async function(cliArgs: CommandOptions_ShadCnAdd) {
+export default async function(cliArgs: CommandOptions_ShadCnAdd, showEndMessage = true) {
     cliArgs.dir = jk_fs.resolve(cliArgs.dir) || process.cwd();
     setProjectRootDir(cliArgs.dir);
 
@@ -1127,7 +1127,9 @@ export default async function(cliArgs: CommandOptions_ShadCnAdd) {
 
     await addDependenciesToPackageJson(cliArgs);
 
-    console.log(`\n${jk_term.textGreen("✔")} Installed`);
+    if (showEndMessage) {
+        console.log(`\n${jk_term.textGreen("✔")} Installed`);
+    }
 
     await updateWorkspaces();
 
@@ -1263,6 +1265,9 @@ async function initComponentsJsonFile(baseDir: string) {
         JSON.stringify(json, null, 4)
     );
 
+    // Note: it contains the theme variables.
+    // It's why it added at the root of the project.
+    //
     let globalCssFile = jk_fs.join(baseDir, "global.css");
 
     if (!await jk_fs.isFile(globalCssFile)) {

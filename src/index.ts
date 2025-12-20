@@ -9,6 +9,7 @@ import commandShadCnAdd, {type CommandOptions_ShadCnAdd} from "./commandes/shadC
 import {commandModInstall, type CommandOptions_ModInstall} from "./commandes/mod_install/index.ts";
 import {commandModCheck, type CommandOptions_ModCheck} from "./commandes/mod_check/index.ts";
 import {commandModNew, type CommandOptions_ModNew} from "./commandes/mod_new/index.ts";
+import commandShadCnInit, {type CommandOptions_ShadCnInit} from "./commandes/shadCn_init/index.ts";
 
 yargs(hideBin(process.argv))
     .command("uid", "Print a new UID", ()=> {} , ()=> {
@@ -67,6 +68,23 @@ yargs(hideBin(process.argv))
             });
         },
         (args: any) => commandShadCnAdd(args as CommandOptions_ShadCnAdd)
+    )
+
+    .command("shadcn-init", "Initialize ShadCN project", (yargs) => {
+            return yargs
+                .option("dir", {
+                    type: "string",
+                    description: "The installation directory.",
+                    default: process.cwd()
+                }).option("yes", {
+                    type: "boolean",
+                    description: "Return yes to each question."
+                }).option("no", {
+                    type: "boolean",
+                    description: "Return no to each question."
+                });
+        },
+        (args: any) => commandShadCnInit(args as CommandOptions_ShadCnInit)
     )
 
     .command("mod-check", "Check the modules", (yargs) => {
