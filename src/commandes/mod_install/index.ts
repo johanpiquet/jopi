@@ -9,9 +9,9 @@ export interface CommandOptions_ModInstall {
     dir: string;
 }
 
-export async function commandModInstall(args: CommandOptions_ModInstall) {
+export async function commandModInstall(args: CommandOptions_ModInstall, showEndMessage = true) {
     const installer = new ModInstaller(args.dir);
-    await installer.install(args.modules);
+    await installer.install(args.modules, showEndMessage);
 }
 
 class ModInstaller {
@@ -21,12 +21,12 @@ class ModInstaller {
     constructor(private rootDir: string) {
     }
 
-    async install(askedModules?: string[]) {
+    async install(askedModules?: string[], showEndMessage = true) {
         let baseName = jk_fs.basename(this.rootDir);
 
         // Is inside a module dir?
         if (baseName.startsWith("mod_")) {
-            console.log("You are inside a module directory. This command should be run from the root of your project.");
+            console.log("🛑 You are inside a module directory. This command should be run from the root of your project.");
             process.exit(1);
         }
 
@@ -34,8 +34,9 @@ class ModInstaller {
             await this.installFromPackageJson(jk_fs.join(this.rootDir, "package.json"))
 
             if (!this.modulesToInstall.length) {
-                console.log("Nothing to do.");
-                process.exit(0);
+                if (showEndMessage) {
+                    console.log("✔ Nothing to do.");
+                }
             }
         } else {
             askedModules = this.cleanUpNames(askedModules);
