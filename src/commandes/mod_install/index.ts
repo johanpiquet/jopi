@@ -51,6 +51,9 @@ class ModInstaller {
 
     private addModulesToInstall(modList: string[]) {
         modList.forEach(modName => {
+            if (modName.startsWith("jopimod_")) modName = modName.substring("jopimod_".length);
+            else if (modName.startsWith("mod_")) modName = modName.substring("mod_".length);
+
             if (this.modulesAlreadyInstalled.includes(modName)) {
                 return;
             }
