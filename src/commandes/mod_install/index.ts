@@ -1,7 +1,7 @@
 import * as jk_fs from "jopi-toolkit/jk_fs";
 import * as jk_term from "jopi-toolkit/jk_term";
 import * as jk_app from "jopi-toolkit/jk_app";
-import {updateWorkspaces} from "jopijs/modules";
+import {JopiProjectInfo, toModDirName, toNpmModuleName, updateWorkspaces} from "jopijs/modules";
 import process from "node:process";
 
 export interface CommandOptions_ModInstall {
@@ -31,7 +31,7 @@ class ModInstaller {
         }
 
         if (!askedModules || !askedModules.length) {
-            await this.installFromPackageJson(jk_fs.join(this.rootDir, "package.json"))
+            await this.installFromPackageJson(this.rootDir)
 
             if (!this.modulesToInstall.length) {
                 if (showEndMessage) {
@@ -39,7 +39,7 @@ class ModInstaller {
                 }
             }
         } else {
-            askedModules = this.cleanUpNames(askedModules);
+            askedModules = askedModules.map(name => toNpmModuleName(name)).filter(n => n !== undefined)
             this.addNpmModulesToInstall(askedModules);
         }
 
@@ -71,41 +71,26 @@ class ModInstaller {
         console.log(`⚠️  ${jk_term.textRed("Invalid module name " + modName)}. Must start with ${jk_term.textGreen("jopimod_")}. Will ignore this module.`);
     }
 
-    private async installThisNpmModule(modName: string) {
+    private async installThisNpmModule(npmName: string) {
         //region Check the module name
 
-        if (!modName.startsWith("jopimod_")) {
-            if (modName[0]==="@") {
-                let idx = modName.indexOf("/");
+        let modName = toModDirName(npmName);
 
-                if (!idx) {
-                    this.onInvalidNpmModuleName(modName);
-                    return;
-                } else {
-                    let name = modName.substring(idx+1);
-
-                    if (!name.startsWith("jopimod_")) {
-                        this.onInvalidNpmModuleName(modName);
-                        return;
-                    }
-                }
-            } else {
-                this.onInvalidNpmModuleName(modName);
-                return;
-            }
+        if (!modName) {
+            this.onInvalidNpmModuleName(npmName);
+            return;
         }
 
         //endregion
 
         //region Check the target dir
 
-        let finalModName = this.calcModNameFromNpmName(modName);
-        let installDir = jk_fs.resolve(this.rootDir, "src", finalModName);
+        let installDir = jk_fs.resolve(this.rootDir, "src", modName);
 
         let stat = await jk_fs.getFileStat(installDir);
 
         if (stat) {
-            console.log(`${jk_term.textBlue("✓")} Module ${jk_term.textBlue(finalModName)} was already installed.`);
+            console.log(`${jk_term.textBlue("✓")} Module ${jk_term.textBlue(npmName)} was already installed.`);
             return;
         }
 
@@ -113,10 +98,10 @@ class ModInstaller {
 
         //region Search the module sources
 
-        let sourceDir = await jk_app.findNodePackageDir(modName, this.rootDir);
+        let sourceDir = await jk_app.findNodePackageDir(npmName, this.rootDir);
 
         if (!sourceDir) {
-            console.log(`⚠️  ${jk_term.textRed("Module not found")} ${jk_term.textBlue(modName)}. Will ignore this module.`);
+            console.log(`⚠️  ${jk_term.textRed("Module not found")} ${jk_term.textBlue(npmName)}. Will ignore this module.`);
             return;
         }
 
@@ -128,76 +113,16 @@ class ModInstaller {
         await jk_fs.copyDirectory(sourceDir, installDir);
 
         // Add his dependencies
-        await this.installFromPackageJson(jk_fs.join(installDir, "package.json"));
+        await this.installFromPackageJson(installDir);
 
         //endregion
 
-        console.log(`${jk_term.textGreen("✓")} Module ${jk_term.textGreen(finalModName)} installed.`);
+        console.log(`${jk_term.textGreen("✓")} Npm module ${jk_term.textGreen(npmName)} installed.`);
     }
 
-    protected async installFromPackageJson(pkgJsonFilePath: string) {
-        // Add his dependencies
-        //
-        let pkgJson = await jk_fs.readJsonFromFile(pkgJsonFilePath);
-        //
-        if (pkgJson) {
-            if (pkgJson.jopi && pkgJson.jopi.modDependencies) {
-                let modDependencies = this.cleanUpNames(pkgJson.jopi.modDependencies);
-                this.addNpmModulesToInstall(modDependencies);
-            }
-
-            if (pkgJson.dependencies) {
-                this.addFromNpmDependencies(pkgJson.dependencies);
-            }
-
-            if (pkgJson.devDependencies) {
-                this.addFromNpmDependencies(pkgJson.devDependencies);
-            }
-        }
-    }
-
-    private cleanUpNames(modDependencies: string[]): string[] {
-        // Here name can be directory the module name or of type mod_modName.
-        // But we need the npm package name.
-        //
-        return modDependencies.map(name => {
-            if (name.startsWith("jopimod_")) return name;
-            if (name[0]==="@") return name;
-            if (name.startsWith("mod_")) name = name.substring("mod_".length);
-
-            return "jopimod_" + name;
-        });
-    }
-
-    private calcModNameFromNpmName(modName: string) {
-        if (modName[0]==="@") {
-            let idx = modName.indexOf("/");
-            let orgName = modName.substring(idx);
-            modName = modName.substring(idx+1);
-            return "mod_" + orgName + '@' + modName;
-        }
-
-        return "mod_" + modName.substring("jopimod_".length);
-    }
-
-    private addFromNpmDependencies(npmDeps: Record<string, string>) {
-        let toAdd: string[] = [];
-
-        for (let depName in npmDeps) {
-            let modName = depName;
-            let orgName: string|undefined = undefined;
-
-            if (depName[0]==="@") {
-                let idx = depName.indexOf("/");
-                orgName = depName.substring(idx);
-                modName = depName.substring(idx+1);
-            }
-
-            if (!modName.startsWith("jopimod_")) continue;
-
-            toAdd.push(depName);
-        }
-
-        this.addNpmModulesToInstall(toAdd);
+    protected async installFromPackageJson(itemDir: string) {
+        let projectInfos = new JopiProjectInfo(itemDir);
+        let deps = await projectInfos.getModDependencies();
+        this.addNpmModulesToInstall(deps);
     }
 }

@@ -49,7 +49,7 @@
     "test:mod-install": "npx jopi mod-install --dir ../__jopi-ui-sample",
     "test:mod-installThis": "npx jopi mod-install mod1 --dir ../__jopi-ui-sample",
     "test:mod-add": "npx jopi mod-new mod_toto --dir ../__jopi-ui-sample",
-    "test:mod-check": "npx jopi mod-check --dir ../__jopi-ui-sample"
+    "test:mod-check": "npx jopi mod-check --dir ../../temp"
   },
   "devDependencies": {
     "@types/bun": "latest",
