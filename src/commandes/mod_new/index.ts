@@ -27,7 +27,7 @@ export async function commandModNew(args: CommandOptions_ModNew) {
     await tryAddDir(jk_fs.join(modDir, "@alias"));
 
     await tryAddFile(jk_fs.join(modDir, "package.json"), `{
-  "name": "${modName}",
+  "name": "jopimod_${modName}",
   "version": "0.0.1",
   "description": "",
   "dependencies": {},
@@ -35,9 +35,9 @@ export async function commandModNew(args: CommandOptions_ModNew) {
   "jopi": { "modDependencies": [] }
 }`);
 
-    await tryAddFile(jk_fs.join(modDir, "uiInit.tsx"), `import {UiKitModule} from "jopijs/uikit";
+    await tryAddFile(jk_fs.join(modDir, "uiInit.tsx"), `import {UiApplication} from "jopijs/ui";
 
-export default function(myModule: UiKitModule) {
+export default function(uiApp: UiApplication) {
 }`);
 
     await tryAddFile(jk_fs.join(modDir, "serverInit.ts"), `import {JopiEasyWebSite} from "jopijs";
