@@ -72,7 +72,7 @@ class ModInstaller {
     }
 
     private async installThisNpmModule(npmName: string) {
-        //region Check the module name
+        //region Checks the module name
 
         let modName = toModDirName(npmName);
 
@@ -96,7 +96,7 @@ class ModInstaller {
 
         //endregion
 
-        //region Search the module sources
+        //region Searches the module sources
 
         let sourceDir = await jk_app.findNodePackageDir(npmName, this.rootDir);
 

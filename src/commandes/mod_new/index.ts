@@ -1,4 +1,4 @@
-import {getModulesList, setProjectRootDir, updateWorkspaces} from "jopijs/modules";
+import {getModulesList, setProjectRootDir, toModDirName, toNpmModuleName, updateWorkspaces} from "jopijs/modules";
 import * as jk_fs from "jopi-toolkit/jk_fs";
 import * as jk_term from "jopi-toolkit/jk_term";
 
@@ -12,8 +12,13 @@ export async function commandModNew(args: CommandOptions_ModNew) {
     setProjectRootDir(rootDir);
 
     let modName = args.moduleName;
-    if (modName.startsWith("mod_")) modName = modName.substring("mod_".length);
-    else if (modName.startsWith("jopimod_")) modName = modName.substring("jopimod_".length);
+    if (!modName.startsWith("mod_") && !modName.includes("jopimod_")) modName = "mod_" + modName;
+    modName = toModDirName(modName)!;
+
+    if (!modName) {
+        console.log(`⚠️ Invalid module name ${jk_term.textRed(args.moduleName)}. Exiting.`);
+        return;
+    }
 
     let allModules = await getModulesList();
     if (allModules[modName]) {
@@ -21,13 +26,14 @@ export async function commandModNew(args: CommandOptions_ModNew) {
         return;
     }
 
-    let modDir = jk_fs.join(rootDir, "src", "mod_" + modName);
-
+    let modDir = jk_fs.join(rootDir, "src", modName);
     await tryAddDir(jk_fs.join(modDir, "@routes"));
     await tryAddDir(jk_fs.join(modDir, "@alias"));
 
+    let npmName = toNpmModuleName(modName);
+
     await tryAddFile(jk_fs.join(modDir, "package.json"), `{
-  "name": "jopimod_${modName}",
+  "name": "${npmName}",
   "version": "0.0.1",
   "description": "",
   "dependencies": {},
