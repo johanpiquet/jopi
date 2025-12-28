@@ -46,9 +46,9 @@ export async function commandModNew(args: CommandOptions_ModNew) {
 export default function(uiApp: JopiUiApplication) {
 }`);
 
-    await tryAddFile(jk_fs.join(modDir, "serverInit.ts"), `import {JopiEasyWebSite} from "jopijs";
+    await tryAddFile(jk_fs.join(modDir, "serverInit.ts"), `import {JopiWebSiteBuilder} from "jopijs";
 
-export default async function(webSite: JopiEasyWebSite) {
+export default async function(webSite: JopiWebSiteBuilder) {
 }`);
 
     console.log(`\n${jk_term.textGreen("✔")} Module ${jk_term.textGreen(modName)} created.`);
