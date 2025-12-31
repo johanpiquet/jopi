@@ -61,8 +61,10 @@ function getLocalDevDir(): string|undefined {
     let v = process.env.JOPI_INIT_USE_DEV_DIR;
     if (!v) return undefined;
     if (v==="0") return undefined;
-
-    if (!jk_fs.isDirectorySync(v)) {
+    
+    let isDir = jk_fs.isDirectorySync(v);
+    console.log("isDir2", isDir);
+    if (!isDir) {
         return undefined;
     }
 

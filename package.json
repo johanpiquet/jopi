@@ -35,10 +35,9 @@
   ],
   "bin": "bin/jopi.js",
   "scripts": {
-    "dev:tsc": "tsc --watch",
+    "dev:tsc-watch": "tsc --watch",
     "dev:tsc-check": "tsc --noEmit",
     "build": "tsc",
-    "tsc": "tsc",
     "jopiLink": "npx jopi-mono link-add",
     "bun-publish": "tsc && bun publish",
     "start": "node ./dist/index.js init --dir ./temp",
