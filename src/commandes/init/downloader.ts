@@ -62,6 +62,20 @@ function getLocalDevDir(): string|undefined {
     if (!v) return undefined;
     if (v==="0") return undefined;
 
+    if (!jk_fs.isDirectorySync(v)) {
+        return undefined;
+    }
+
+    let flagFilePath = jk_fs.join(v, "jopi-ignore.enable");
+    
+    if (jk_fs.isFileSync(flagFilePath)) {
+        console.log("JOPI_INIT_USE_DEV_DIR - Flag found. Ignoring");
+        return undefined;
+    } else {
+        jk_fs.writeTextToFileSync(jk_fs.join(v, "_jopi-ignore.enable"), "");
+    }
+        
+
     console.log("JOPI_INIT_USE_DEV_DIR - Using local dev directory:", v);
     return v;
 }

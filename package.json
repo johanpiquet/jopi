@@ -1,6 +1,6 @@
 {
   "name": "jopi",
-  "version": "2.0.33",
+  "version": "3.1.1",
   "license": "MIT",
   "homepage": "https://github.com/johanpiquet/jopijs",
   "keywords": [
@@ -35,11 +35,12 @@
   ],
   "bin": "bin/jopi.js",
   "scripts": {
-    "dev:tsc": "npx tsc --watch",
-    "build": "npx tsc",
-    "tsc": "npx tsc",
+    "dev:tsc": "tsc --watch",
+    "dev:tsc-check": "tsc --noEmit",
+    "build": "tsc",
+    "tsc": "tsc",
     "jopiLink": "npx jopi-mono link-add",
-    "bun-publish": "npx tsc && bun publish",
+    "bun-publish": "tsc && bun publish",
     "start": "node ./dist/index.js init --dir ./temp",
     "clean": "rm -rf ./dist .turbo tsconfig.tsbuildinfo",
     "test:init:tutorial": "npx jopi init --template tutorial --dir ../../temp",
@@ -62,6 +63,6 @@
     "jopijs": "workspace:^",
     "yargs": "^18.0.0"
   },
-  "publishedDate": "12/21/2025",
+  "publishedDate": "12/31/2025",
   "publicPublishedDate": "12/20/2025"
 }
