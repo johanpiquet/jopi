@@ -2,6 +2,7 @@ import * as jk_fs from "jopi-toolkit/jk_fs";
 import process from "node:process";
 import {githubDownload} from "jopi-toolkit/jk_tools";
 import {createTempDir} from "jopi-toolkit/jk_fs";
+import * as jk_term from "jopi-toolkit/jk_term";
 
 const GITHUB_URL = "https://github.com/jopijs/jopiProjectTemplates";
 
@@ -43,7 +44,7 @@ export async function downloadFile(internalPath: string, outputPath: string): Pr
     await jk_fs.mkDir(jk_fs.dirname(outputPath));
 
     if (gLocalDevDir) {
-        await jk_fs.copyFile(jk_fs.join(gLocalDevDir, internalPath), outputPath);
+        await jk_fs.copyFile(jk_fs.join(gLocalDevDir, "projects_v2", internalPath), outputPath);
     } else {
         await githubDownload({
             url: GITHUB_URL + "/tree/main/projects_v2/" + internalPath,
@@ -61,24 +62,20 @@ function getLocalDevDir(): string|undefined {
     let v = process.env.JOPI_INIT_USE_DEV_DIR;
     if (!v) return undefined;
     if (v==="0") return undefined;
+    if (!jk_fs.isDirectorySync(v)) return undefined;
     
-    let isDir = jk_fs.isDirectorySync(v);
-    console.log("isDir2", isDir);
-    if (!isDir) {
-        return undefined;
-    }
-
     let flagFilePath = jk_fs.join(v, "jopi-ignore.enable");
     
     if (jk_fs.isFileSync(flagFilePath)) {
-        console.log("JOPI_INIT_USE_DEV_DIR - Flag found. Ignoring");
+        jk_term.logBgBlue("JOPI_INIT_USE_DEV_DIR - Flag found. Ignoring");
         return undefined;
     } else {
         jk_fs.writeTextToFileSync(jk_fs.join(v, "_jopi-ignore.enable"), "");
     }
         
+    jk_term.logBgRed("Using local dev directory:", v);
+    v = process.env.JOPI_INIT_USE_DEV_DIR;
 
-    console.log("JOPI_INIT_USE_DEV_DIR - Using local dev directory:", v);
     return v;
 }
 
