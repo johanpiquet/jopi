@@ -1,6 +1,6 @@
 {
   "name": "jopi",
-  "version": "3.1.1",
+  "version": "3.1.4",
   "license": "MIT",
   "homepage": "https://github.com/johanpiquet/jopijs",
   "keywords": [
@@ -35,13 +35,11 @@
   ],
   "bin": "bin/jopi.js",
   "scripts": {
+    "dev:build": "tsc",
     "dev:tsc-watch": "tsc --watch",
     "dev:tsc-check": "tsc --noEmit",
-    "build": "tsc",
     "jopiLink": "npx jopi-mono link-add",
-    "bun-publish": "tsc && bun publish",
-    "start": "node ./dist/index.js init --dir ./temp",
-    "clean": "rm -rf ./dist .turbo tsconfig.tsbuildinfo",
+    
     "test:init:tutorial": "npx jopi init --template tutorial --dir ../../temp",
     "test:init:list-choices": "npx jopi init --dir ../../temp",
     "test:shadcn-add:test1": "npx jopi shadcn-add table chart --mod testShadInstaller --dir ../../__packages/__jopi-tutorial --yes",
@@ -54,10 +52,10 @@
     "test:mod-check": "npx jopi mod-check --dir ../../temp"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "@types/yargs": "^17.0.33"
   },
   "dependencies": {
+    "@types/bun": "latest",
+    "@types/yargs": "^17.0.33",
     "@inquirer/prompts": "^7.9.0",
     "jopijs": "workspace:^",
     "yargs": "^18.0.0"
