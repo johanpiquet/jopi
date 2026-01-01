@@ -173,14 +173,12 @@ class FileInstaller {
 
     protected getRelatifShadCnDirPath(filePath: string) {
         let parts = filePath.split(/[\\/]/);
-        // depth is parts.length - 2 because:
-        // "shadCN/ui/button.tsx" -> ["shadCN", "ui", "button.tsx"] -> 3 parts
-        // we are in "shadCN/ui/"
-        // to reach "shadCN/", we need relative path to be one level up: ".."
-        // so 3 - 2 = 1.
-        let depth = parts.length - 2;
-        if (depth <= 0) return ".";
-        return "../".repeat(depth).slice(0, -1);
+        // If path is "@routes/shadPages/dashboard-01/page.tsx", parts.length is 4.
+        // We need 3 levels to get to module root: "../../../"
+        // Then append "shadCN".
+        let depth = parts.length - 1;
+        if (depth <= 0) return "shadCN";
+        return "../".repeat(depth) + "shadCN";
     }
 
     protected patchAliasImports(fileInfos: ShadCn_FileInfos, filePath: string) {
@@ -294,21 +292,30 @@ class FileInstaller {
     }
 }
 
+function stripShadCnAppPrefix(filePath: string): string {
+    if (filePath.startsWith("app/")) {
+        filePath = filePath.substring("app/".length);
+        let idx = filePath.indexOf("/");
+        if (idx !== -1) {
+            filePath = filePath.substring(idx + 1);
+        }
+    }
+    return filePath;
+}
+
 class FileInstaller_Page extends FileInstaller {
     protected patchFilePath(filePath: string): string {
         const fileDir = "@routes/shadPages/" + this.params.parentItemName + "/";
+        filePath = stripShadCnAppPrefix(filePath);
         filePath = super.patchFilePath(filePath);
         return fileDir + filePath;
-    }
-
-    protected getRelatifShadCnDirPath() {
-        return "../../../shadCN";
     }
 }
 
 class FileInstaller_PageFile extends FileInstaller {
     protected patchFilePath(filePath: string): string {
         let basePath = "@routes/shadPages/" + this.params.parentItemName;
+        filePath = stripShadCnAppPrefix(filePath);
         filePath = super.patchFilePath(filePath);
         return basePath + "/" + filePath;
     }
