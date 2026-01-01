@@ -1139,11 +1139,21 @@ export default async function (cliArgs: CommandOptions_ShadCnAdd, showEndMessage
 }
 
 async function installItem(cliArgs: CommandOptions_ShadCnAdd, itemName: string, style: any) {
-    let url = `https://ui.shadcn.com/r/styles/${style}/${itemName}.json`;
-    if (cliArgs.registry) url = cliArgs.registry + "/" + itemName + ".json";
+    let url: string;
+
+    if (itemName.startsWith("http://") || itemName.startsWith("https://")) {
+        url = itemName;
+    } else if (itemName.startsWith("@")) {
+        // Support for shadcnregistry.com short names (e.g. @animate-ui/...)
+        // Convention: @scope/name -> https://shadcnregistry.com/r/scope/name.json
+        url = `https://shadcnregistry.com/r/${itemName.substring(1)}.json`;
+    } else {
+        url = `https://ui.shadcn.com/r/styles/${style}/${itemName}.json`;
+        if (cliArgs.registry) url = cliArgs.registry + "/" + itemName + ".json";
+    }
 
     let content = await fetch(url);
-    if (!content.ok) stopError(`Error fetching ${url}`);
+    if (!content.ok) stopError(`Error fetching ${url}\nIf you are using a custom component, please check the name or provide the full URL.`);
 
     let json = await content.json() as ShadCn_ComponentJson;
 

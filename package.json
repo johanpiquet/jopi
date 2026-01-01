@@ -39,20 +39,19 @@
     "dev:tsc-watch": "tsc --watch",
     "dev:tsc-check": "tsc --noEmit",
     "jopiLink": "npx jopi-mono link-add",
-    
     "test:init:tutorial": "npx jopi init --template tutorial --dir ../../temp",
     "test:init:list-choices": "npx jopi init --dir ../../temp",
     "test:shadcn-add:test1": "npx jopi shadcn-add table chart --mod testShadInstaller --dir ../../__packages/__jopi-tutorial --yes",
     "test:shadcn-add:dashboard-01": "npx jopi shadcn-add  dashboard-01 --mod testShadInstaller --dir ../../__packages/__jopi-tutorial --yes",
-    "test:shadcn-init": "npx jopi shadcn-init --dir ../../__packages/__jopi-tutorial",
-    "test:mod-install": "npx jopi mod-install --dir ../../__packages/__jopi-tutorial",
-    "test:mod-installThis": "npx jopi mod-install mod1 --dir ../../__packages/__jopi-tutorial",
-    "test:mod-add": "npx jopi mod-new mod_toto --dir ../../__packages/__jopi-tutorial",
-    "test:mod-new": "npx jopi mod-new myModuleName --dir ../../__packages/__jopi-tutorial",
-    "test:mod-check": "npx jopi mod-check --dir ../../temp"
+    "test:shadcn-add:animate-ui": "npx jopi shadcn-add  @animate-ui/primitives-texts-sliding-number --mod testAnimateUI --dir ../../__packages/__jopi-tutorial --yes",
+    "test:shadcn-init": "npx jopi shadcn-init --dir ../../__packages/_jopi-tests --yes",
+    "test:mod-install": "npx jopi mod-install --dir ../../__packages/_jopi-tests",
+    "test:mod-installThis": "npx jopi mod-install mod1 --dir ../../__packages/_jopi-tests",
+    "test:mod-add": "npx jopi mod-new mod_toto --dir ../../__packages/_jopi-tests",
+    "test:mod-new": "npx jopi mod-new myModuleName --dir ../../__packages/_jopi-tests",
+    "test:mod-check": "npx jopi mod-check --dir ../../__packages/_jopi-tests"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "dependencies": {
     "@types/bun": "latest",
     "@types/yargs": "^17.0.33",
