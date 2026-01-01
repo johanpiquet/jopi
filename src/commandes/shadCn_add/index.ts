@@ -97,7 +97,7 @@ class FileInstaller {
     }
 
     async install() {
-        let filePath = this.patchFilePath(this.params.fileInfos.path);
+        let filePath = this.patchFilePath(this.params.fileInfos.target || this.params.fileInfos.path);
 
         // Convert to platform-agnostic (win32 or linux)
         filePath = jk_fs.join(...filePath.split("/"));
@@ -105,7 +105,7 @@ class FileInstaller {
         this.installLocalPath = jk_fs.join("src", this.params.cliArgs.mod, filePath);
         this.installFinalPath = jk_fs.join(this.params.cliArgs.dir, this.installLocalPath);
 
-        await this.onBeforeInstall(this.params.fileInfos)
+        await this.onBeforeInstall(this.params.fileInfos, filePath)
 
         if (!await this.confirmReplaceFile(this.params.fileInfos.content)) {
             this.params.fileInfos.content = "[jopi-done]";
@@ -118,8 +118,8 @@ class FileInstaller {
         this.params.fileInfos.content = "[jopi-done]";
     }
 
-    protected async onBeforeInstall(fileInfos: ShadCn_FileInfos) {
-        this.patchAliasImports(fileInfos);
+    protected async onBeforeInstall(fileInfos: ShadCn_FileInfos, filePath: string) {
+        this.patchAliasImports(fileInfos, filePath);
     }
 
     // ***************
@@ -150,28 +150,40 @@ class FileInstaller {
             }
         }
 
+        if (filePath.startsWith("registry/")) {
+            filePath = filePath.substring("registry/".length);
+        }
+
         if (this.useAliasMod) {
-            if (filePath.startsWith("ui/")) return replace("ui/", "@alias/shadUI/", filePath);
-            if (filePath.startsWith("lib/")) return replace("lib/", "@alias/shadLib/", filePath);
-            if (filePath.startsWith("hooks/")) return replace("hooks/", "@alias/shadHooks/", filePath);
-            if (filePath.startsWith("utils/")) return replace("utils/", "@alias/shadUtils/", filePath);
-            if (filePath.startsWith("components/")) return replace("components/", "@alias/shadComponents/", filePath);
+            if (filePath.startsWith("ui/")) filePath = replace("ui/", "@alias/shadUI/", filePath);
+            else if (filePath.startsWith("lib/")) filePath = replace("lib/", "@alias/shadLib/", filePath);
+            else if (filePath.startsWith("hooks/")) filePath = replace("hooks/", "@alias/shadHooks/", filePath);
+            else if (filePath.startsWith("utils/")) filePath = replace("utils/", "@alias/shadUtils/", filePath);
+            else if (filePath.startsWith("components/")) filePath = replace("components/", "@alias/shadComponents/", filePath);
         } else {
-            if (filePath.startsWith("ui/")) return replace("ui/", "shadCN/ui/", filePath);
-            if (filePath.startsWith("lib/")) return replace("lib/", "shadCN/lib/", filePath);
-            if (filePath.startsWith("hooks/")) return replace("hooks/", "shadCN/hooks/", filePath);
-            if (filePath.startsWith("utils/")) return replace("utils/", "shadCN/utils/", filePath);
-            if (filePath.startsWith("components/")) return replace("components/", "shadCN/components/", filePath);
+            if (filePath.startsWith("ui/")) filePath = replace("ui/", "shadCN/ui/", filePath);
+            else if (filePath.startsWith("lib/")) filePath = replace("lib/", "shadCN/lib/", filePath);
+            else if (filePath.startsWith("hooks/")) filePath = replace("hooks/", "shadCN/hooks/", filePath);
+            else if (filePath.startsWith("utils/")) filePath = replace("utils/", "shadCN/utils/", filePath);
+            else if (filePath.startsWith("components/")) filePath = replace("components/", "shadCN/components/", filePath);
         }
 
         return filePath;
     }
 
-    protected getRelatifShadCnDirPath() {
-        return "..";
+    protected getRelatifShadCnDirPath(filePath: string) {
+        let parts = filePath.split(/[\\/]/);
+        // depth is parts.length - 2 because:
+        // "shadCN/ui/button.tsx" -> ["shadCN", "ui", "button.tsx"] -> 3 parts
+        // we are in "shadCN/ui/"
+        // to reach "shadCN/", we need relative path to be one level up: ".."
+        // so 3 - 2 = 1.
+        let depth = parts.length - 2;
+        if (depth <= 0) return ".";
+        return "../".repeat(depth).slice(0, -1);
     }
 
-    protected patchAliasImports(fileInfos: ShadCn_FileInfos) {
+    protected patchAliasImports(fileInfos: ShadCn_FileInfos, filePath: string) {
         const doPatch = (text: string): string => {
             const content = text;
 
@@ -240,7 +252,7 @@ class FileInstaller {
                             theImport = "@/" + group + "/" + item;
                         }
                         else {
-                            theImport = this.getRelatifShadCnDirPath() + "/" + group + "/" + item;
+                            theImport = this.getRelatifShadCnDirPath(filePath) + "/" + group + "/" + item;
                         }
 
                         line = line.substring(0, idxFromTargetBegin) + theImport + line.substring(idxFromTargetEnd);
