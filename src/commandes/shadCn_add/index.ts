@@ -1,23 +1,23 @@
 import * as jk_fs from "jopi-toolkit/jk_fs";
 import * as jk_term from "jopi-toolkit/jk_term";
-import {onProjectDependenciesAdded, setProjectRootDir, updateWorkspaces} from "jopijs/modules";
+import { onProjectDependenciesAdded, setProjectRootDir, updateWorkspaces } from "jopijs/modules";
 
 import process from "node:process";
-import {confirm, select} from '@inquirer/prompts';
+import { confirm, select } from '@inquirer/prompts';
 
 //region Interfaces
 
 type ShadCnType = "registry:lib" |
-                "registry:block" |
-                "registry:component" |
-                "registry:ui" |
-                "registry:hook" |
-                "registry:theme" |
-                "registry:page" |
-                "registry:file" |
-                "registry:style" |
-                "registry:base"|
-                "registry:item";
+    "registry:block" |
+    "registry:component" |
+    "registry:ui" |
+    "registry:hook" |
+    "registry:theme" |
+    "registry:page" |
+    "registry:file" |
+    "registry:style" |
+    "registry:base" |
+    "registry:item";
 
 export interface CommandOptions_ShadCnAdd {
     components: string[],
@@ -143,7 +143,7 @@ class FileInstaller {
             return replaceBy + filePath.substring(toReplace.length);
         }
 
-        if (this.params.parentType==="registry:block") {
+        if (this.params.parentType === "registry:block") {
             let prefix = "blocks/" + this.params.parentItemName + "/";
             if (filePath.startsWith(prefix)) {
                 filePath = filePath.substring(prefix.length);
@@ -179,7 +179,7 @@ class FileInstaller {
             let lines = content.split("\n");
             let max = lines.length;
 
-            for (let i=0;i<max;i++) {
+            for (let i = 0; i < max; i++) {
                 let line = lines[i];
                 let lineImport = line;
 
@@ -187,11 +187,11 @@ class FileInstaller {
                     let lineFrom = line;
                     let idxFrom = lineImport.indexOf("from");
 
-                    while (idxFrom===-1) {
+                    while (idxFrom === -1) {
                         newContent.push(lineFrom);
 
                         i++;
-                        if (i===max) return newContent.join("\n");
+                        if (i === max) return newContent.join("\n");
 
                         lineFrom = lines[i];
                         idxFrom = lineFrom.indexOf("from");
@@ -200,12 +200,12 @@ class FileInstaller {
                     line = lineFrom;
                     let idxFromTargetBegin = lineFrom.indexOf("@/", idxFrom);
 
-                    if (idxFromTargetBegin===-1) {
+                    if (idxFromTargetBegin === -1) {
                         newContent.push(lineFrom);
                         continue;
                     }
 
-                    let sep = line[idxFromTargetBegin-1];
+                    let sep = line[idxFromTargetBegin - 1];
                     let idxFromTargetEnd = lineFrom.indexOf(sep, idxFromTargetBegin);
 
                     let theImport = lineFrom.substring(idxFromTargetBegin, idxFromTargetEnd);
@@ -266,14 +266,14 @@ class FileInstaller {
             let currentContent = await jk_fs.readTextFromFile(this.installFinalPath);
 
             // Content is identical? Nothing to do.
-            if (currentContent.trim()===expectedContent.trim()) {
+            if (currentContent.trim() === expectedContent.trim()) {
                 return false;
             }
 
-            if (this.params.cliArgs.no===true) return false;
+            if (this.params.cliArgs.no === true) return false;
 
-            if (this.params.cliArgs.yes!==true) {
-                let res = await confirm({message: `Override file ${jk_term.textBlue(this.installFinalPath)}`, default: false});
+            if (this.params.cliArgs.yes !== true) {
+                let res = await confirm({ message: `Override file ${jk_term.textBlue(this.installFinalPath)}`, default: false });
                 if (!res) return false;
             }
         }
@@ -362,27 +362,27 @@ class ItemInstaller {
         function appendAll() {
             for (let dep of list) {
                 let dep2 = dep;
-                if (dep[0]==="@") dep2 = dep.substring(1);
+                if (dep[0] === "@") dep2 = dep.substring(1);
 
                 let version = "latest";
                 let name = dep;
 
                 let idx = dep2.indexOf("@");
 
-                if (idx!==-1) {
+                if (idx !== -1) {
                     name = dep2.substring(0, idx);
-                    version = dep2.substring(idx+1);
+                    version = dep2.substring(idx + 1);
 
-                    if (version!=="latest") {
+                    if (version !== "latest") {
                         let first = version[0];
-                        if ((first!=="^") && (first!==">") && (first !== "~")) version = "^" + version;
+                        if ((first !== "^") && (first !== ">") && (first !== "~")) version = "^" + version;
                     }
                 }
 
                 let currentVersion = map[name];
 
                 if (currentVersion) {
-                    if (version==="latest") {
+                    if (version === "latest") {
                         continue;
                     }
                 }
@@ -446,7 +446,7 @@ export function cn(...inputs: ClassValue[]) {
                 return (new FileInstaller_Page(fileParams)).install();
 
             case "registry:file":
-                if (fileParams.parentType!=="registry:block") {
+                if (fileParams.parentType !== "registry:block") {
                     console.log("Ignoring invalid file", fileParams.fileInfos.path);
                     return undefined;
                 }
@@ -1102,7 +1102,7 @@ function stopError(msg: string) {
     process.exit(1);
 }
 
-export default async function(cliArgs: CommandOptions_ShadCnAdd, showEndMessage = true) {
+export default async function (cliArgs: CommandOptions_ShadCnAdd, showEndMessage = true) {
     cliArgs.dir = jk_fs.resolve(cliArgs.dir) || process.cwd();
     setProjectRootDir(cliArgs.dir);
 
@@ -1111,13 +1111,13 @@ export default async function(cliArgs: CommandOptions_ShadCnAdd, showEndMessage 
     let componentsJson = await jk_fs.readJsonFromFile(cliArgs.dir + "/components.json");
 
     if (!componentsJson) {
-        await initComponentsJsonFile(cliArgs.dir);
+        await initComponentsJsonFile(cliArgs);
         componentsJson = await jk_fs.readJsonFromFile(cliArgs.dir + "/components.json");
     }
 
     // "new-york" or "default"
     let baseStyleName = componentsJson.style;
-    
+
     while (true) {
         let component = cliArgs.components.pop();
         if (!component) break;
@@ -1193,12 +1193,12 @@ async function addDependenciesToPackageJson(cliArgs: CommandOptions_ShadCnAdd) {
 
     if (!moduleJson.dependencies) moduleJson.dependencies = {};
 
-    if (moduleJson.dependencies["react"]!=="*") {
+    if (moduleJson.dependencies["react"] !== "*") {
         moduleJson.dependencies["react"] = "*";
         mustSaveModJson = true;
     }
 
-    if (moduleJson.dependencies["react-dom"]!=="*") {
+    if (moduleJson.dependencies["react-dom"] !== "*") {
         moduleJson.dependencies["react-dom"] = "*";
         mustSaveModJson = true;
     }
@@ -1217,22 +1217,29 @@ async function addDependenciesToPackageJson(cliArgs: CommandOptions_ShadCnAdd) {
     }
 }
 
-async function initComponentsJsonFile(baseDir: string) {
-    jk_term.logRed("components.json not found.");
-    let accept = await confirm({message: "Would you like to create a new project?", default: true});
-    if (!accept) stopError("Aborted.");
+async function initComponentsJsonFile(cliArgs: CommandOptions_ShadCnAdd) {
+    const baseDir = cliArgs.dir;
+    let selectedColor: string;
 
-    const selectedColor = await select({
-        message: 'Which color to use?',
+    if (cliArgs.yes) {
+        selectedColor = "neutral";
+    } else {
+        jk_term.logRed("components.json not found.");
+        let accept = await confirm({ message: "Would you like to create a new project?", default: true });
+        if (!accept) stopError("Aborted.");
 
-        choices: [
-            {value: 'gray'},
-            {value: 'neutral'},
-            {value: 'slate'},
-            {value: 'stone'},
-            {value: 'zinc'}
-        ]
-    });
+        selectedColor = await select({
+            message: 'Which color to use?',
+
+            choices: [
+                { value: 'gray' },
+                { value: 'neutral' },
+                { value: 'slate' },
+                { value: 'stone' },
+                { value: 'zinc' }
+            ]
+        });
+    }
 
     const json = {
         "$schema": "https://ui.shadcn.com/schema.json",
