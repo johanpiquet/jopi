@@ -3,6 +3,7 @@ import * as jk_term from "jopi-toolkit/jk_term";
 import * as jk_app from "jopi-toolkit/jk_app";
 import {JopiProjectInfo, toModDirName, toNpmModuleName, updateWorkspaces} from "jopijs/modules";
 import process from "node:process";
+import { logModulesInstaller } from "./_logs.ts";
 
 export interface CommandOptions_ModInstall {
     modules?: string[];
@@ -58,6 +59,10 @@ class ModInstaller {
     }
 
     protected async installAllModules() {
+        logModulesInstaller.info((w) => {
+            w("Modules to install", { modules: this.modulesToInstall });
+        });
+        
         while (true) {
             const modName = this.modulesToInstall.pop();
             if (modName===undefined) break;
@@ -77,6 +82,8 @@ class ModInstaller {
         let modName = toModDirName(npmName);
 
         if (!modName) {
+            console.log(`⚠️ Can't convert to valid module name: ${npmName}`);
+
             this.onInvalidNpmModuleName(npmName);
             return;
         }
@@ -123,6 +130,11 @@ class ModInstaller {
     protected async installFromPackageJson(itemDir: string) {
         let projectInfos = new JopiProjectInfo(itemDir);
         let deps = await projectInfos.getModDependencies();
+
+        logModulesInstaller.info((w) => {
+            w("Modules found inside package.json", { modules: deps });
+        });
+
         this.addNpmModulesToInstall(deps);
     }
 }

@@ -1,6 +1,6 @@
 {
   "name": "jopi",
-  "version": "3.1.8",
+  "version": "3.1.11",
   "license": "MIT",
   "homepage": "https://github.com/johanpiquet/jopijs",
   "keywords": [
@@ -34,7 +34,7 @@
     "src"
   ],
   "bin": "bin/jopi.js",
-  "scripts": {
+  "scripts": { 
     "dev:build": "tsc",
     "dev:tsc-watch": "tsc --watch",
     "dev:tsc-check": "tsc --noEmit",
@@ -58,6 +58,6 @@
     "jopijs": "workspace:^",
     "yargs": "^18.0.0"
   },
-  "publishedDate": "1/1/2026",
+  "publishedDate": "1/4/2026",
   "publicPublishedDate": "12/20/2025"
 }
