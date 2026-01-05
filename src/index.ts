@@ -10,6 +10,7 @@ import {commandModInstall, type CommandOptions_ModInstall} from "./commandes/mod
 import {commandModCheck, type CommandOptions_ModCheck} from "./commandes/mod_check/index.ts";
 import {commandModNew, type CommandOptions_ModNew} from "./commandes/mod_new/index.ts";
 import commandShadCnInit, {type CommandOptions_ShadCnInit} from "./commandes/shadCn_init/index.ts";
+import commandLink, {type CommandOptions_Link} from "./commandes/link/index.ts";
 
 yargs(hideBin(process.argv))
     .command("uid", "Print a new UID", ()=> {} , ()=> {
@@ -124,6 +125,15 @@ yargs(hideBin(process.argv))
         },
         (args: any) => commandModInstall(args as CommandOptions_ModInstall)
     )
+
+    .command("link", "Trigger the code generation for the project", (yargs) => {
+        return yargs
+            .option("dir", {
+                type: "string",
+                description: "The project directory.",
+                default: process.cwd()
+            });
+    }, (args: any) => commandLink(args as CommandOptions_Link))
 
     .demandCommand(1, 'You must specify a valid command.')
     .version("2.0").help().parse();
