@@ -50,7 +50,8 @@
     "test:mod-installThis": "npx jopi mod-install mod1 --dir ../../__packages/_jopi-tests",
     "test:mod-add": "npx jopi mod-new mod_toto --dir ../../__packages/_jopi-tests",
     "test:mod-new": "npx jopi mod-new myModuleName --dir ../../__packages/_jopi-tests",
-    "test:mod-check": "npx jopi mod-check --dir ../../__packages/_jopi-tests"
+    "test:mod-check": "npx jopi mod-check --dir ../../__packages/_jopi-tests",
+    "test:link": "npx jopi link --dir ../../__packages/_jopi-tests"
   },
   "dependencies": {
     "@inquirer/prompts": "^7.9.0",
