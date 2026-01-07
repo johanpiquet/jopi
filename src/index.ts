@@ -10,7 +10,8 @@ import {commandModInstall, type CommandOptions_ModInstall} from "./commandes/mod
 import {commandModCheck, type CommandOptions_ModCheck} from "./commandes/mod_check/index.ts";
 import {commandModNew, type CommandOptions_ModNew} from "./commandes/mod_new/index.ts";
 import commandShadCnInit, {type CommandOptions_ShadCnInit} from "./commandes/shadCn_init/index.ts";
-import commandLink, {type CommandOptions_Link} from "./commandes/link/index.ts";
+import commandCodegen, {type CommandOptions_Codegen} from "./commandes/codegen/index.ts";
+import {commandLink, commandLinkList, type CommandOptions_Link} from "./commandes/link/index.ts";
 
 yargs(hideBin(process.argv))
     .command("uid", "Print a new UID", ()=> {} , ()=> {
@@ -126,14 +127,30 @@ yargs(hideBin(process.argv))
         (args: any) => commandModInstall(args as CommandOptions_ModInstall)
     )
 
-    .command("link", "Trigger the code generation for the project", (yargs) => {
+    .command("link [modules..]", "Symlink local modules", (yargs) => {
+        return yargs
+            .positional('modules', {
+                type: 'string',
+                array: true,
+                describe: 'Modules to link (optional)',
+            })
+            .option("dir", {
+                type: "string",
+                description: "Context directory",
+                default: process.cwd()
+            });
+    }, (args: any) => commandLink(args as CommandOptions_Link))
+
+    .command("link-list", "List globally linked modules", () => {}, () => commandLinkList())
+
+    .command("codegen", "Trigger the code generation for the project", (yargs) => {
         return yargs
             .option("dir", {
                 type: "string",
                 description: "The project directory.",
                 default: process.cwd()
             });
-    }, (args: any) => commandLink(args as CommandOptions_Link))
+    }, (args: any) => commandCodegen(args as CommandOptions_Codegen))
 
     .demandCommand(1, 'You must specify a valid command.')
     .version("2.0").help().parse();
