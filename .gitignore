@@ -8,3 +8,5 @@ logs
 dist
 /tsconfig.tsbuildinfo
 temp
+.jopi-sync.json
+.jopi.state.updating

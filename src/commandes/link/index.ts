@@ -179,3 +179,88 @@ export async function commandLinkList() {
         }
     }
 }
+
+/**
+ * Copies a globally registered module into the current project's src/ directory (instead of symlinking).
+ * @param args Command options containing directory and module names.
+ */
+export async function commandLinkCopy(args: CommandOptions_Link) {
+    if (!args.modules || args.modules.length === 0) {
+        jk_term.logRed("Error: You must specify module names to copy.");
+        return;
+    }
+
+    await ensureGlobalLinksDir();
+
+    const projectRoot = path.resolve(args.dir);
+    const srcDir = path.join(projectRoot, "src");
+
+    if (!await jk_fs.isDirectory(srcDir)) {
+        jk_term.logBgRed("❌ Error: 'src' directory not found in project.");
+        return;
+    }
+
+    for (const rawName of args.modules) {
+        const modName = toModDirName(rawName);
+        if (!modName) {
+            console.log(jk_term.textRed(`Warning: Invalid module name '${rawName}'. Skipping.`));
+            continue;
+        }
+
+        const globalLinkPath = path.join(GLOBAL_LINKS_DIR, modName);
+        
+        try {
+            await fs.access(globalLinkPath);
+        } catch {
+            console.log(jk_term.textRed(`Error: Module '${modName}' not found in global links.`));
+            continue;
+        }
+
+        const destPath = path.join(srcDir, modName);
+        let destExists = false;
+        try {
+            await fs.access(destPath);
+            destExists = true;
+        } catch {}
+
+        if (destExists) {
+            const markerPath = path.join(destPath, "_JOPI_LINK_ALLOWS_REPLACE__.txt");
+            let isSafeToOverwrite = false;
+            try {
+                await fs.access(markerPath);
+                isSafeToOverwrite = true;
+            } catch {}
+
+            if (isSafeToOverwrite) {
+                jk_term.logBlue(`ℹ Overwriting existing module copy '${modName}'...`);
+                try {
+                    await fs.rm(destPath, { recursive: true, force: true });
+                } catch (e) {
+                     jk_term.logBgRed(`❌ Error removing existing module '${modName}':`, e);
+                     continue;
+                }
+            } else {
+                 console.log(jk_term.textRed(`Error: Directory or file '${modName}' already exists in src/ and was NOT created by 'link-copy' (marker missing). Aborting.`));
+                 continue;
+            }
+        }
+
+        try {
+            const targetPath = await fs.readlink(globalLinkPath);
+            jk_term.logBlue(`Copying module '${modName}' from ${targetPath}...`);
+            
+            // Using jk_fs.copyDirectory which should handle recursive copy
+            await jk_fs.copyDirectory(targetPath, destPath);
+
+            // Create _JOPI_LINK_ALLOWS_REPLACE__.txt
+            const sourceInfoFile = path.join(destPath, "_JOPI_LINK_ALLOWS_REPLACE__.txt");
+            await jk_fs.writeTextToFile(sourceInfoFile, targetPath);
+            
+            jk_term.logGreen(`✓ Module '${modName}' copied to project.`);
+        } catch (e) {
+            jk_term.logBgRed(`❌ Error copying module '${modName}':`, e);
+        }
+    }
+
+    await updateWorkspaces();
+}

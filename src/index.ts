@@ -11,7 +11,7 @@ import {commandModCheck, type CommandOptions_ModCheck} from "./commandes/mod_che
 import {commandModNew, type CommandOptions_ModNew} from "./commandes/mod_new/index.ts";
 import commandShadCnInit, {type CommandOptions_ShadCnInit} from "./commandes/shadCn_init/index.ts";
 import commandCodegen, {type CommandOptions_Codegen} from "./commandes/codegen/index.ts";
-import {commandLink, commandLinkList, type CommandOptions_Link} from "./commandes/link/index.ts";
+import {commandLink, commandLinkList, commandLinkCopy, type CommandOptions_Link} from "./commandes/link/index.ts";
 
 yargs(hideBin(process.argv))
     .command("uid", "Print a new UID", ()=> {} , ()=> {
@@ -142,6 +142,21 @@ yargs(hideBin(process.argv))
     }, (args: any) => commandLink(args as CommandOptions_Link))
 
     .command("link-list", "List globally linked modules", () => {}, () => commandLinkList())
+
+    .command("link-copy [modules..]", "Copy globally linked modules to src/", (yargs) => {
+        return yargs
+            .positional('modules', {
+                type: 'string',
+                array: true,
+                describe: 'Modules to copy',
+                demandOption: true
+            })
+            .option("dir", {
+                type: "string",
+                description: "Context directory",
+                default: process.cwd()
+            });
+    }, (args: any) => commandLinkCopy(args as CommandOptions_Link))
 
     .command("codegen", "Trigger the code generation for the project", (yargs) => {
         return yargs
