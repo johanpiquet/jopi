@@ -80,7 +80,7 @@ export default async function(argv: CommandOptions_Init) {
 
     //region Downloads the project
 
-    await installProjectSources(project, selection.installDir);
+    await installProjectSources(project.template, selection.installDir);
 
     //endregion
 
@@ -128,6 +128,15 @@ async function executeProjectInstaller(project: ProjectItem, selection: Selected
     //endregion
 }
 
-async function installProjectSources(project: ProjectItem, installDir: string) {
-    await downloadProject(project.template + "/project.zip", installDir);
+async function installProjectSources(projectTemplate: string, installDir: string) {
+    await downloadProject(projectTemplate + "/project.zip", installDir);
+
+    // Allows minimal template to override the core file.
+    // This allows an easy update of the core files witout patching
+    // the demo-project each time.
+    //
+    if (projectTemplate !== "minimal") {
+        console.log("Overriding core config files...")
+        await downloadProject("minimal/project.zip", installDir);
+    }
 }
